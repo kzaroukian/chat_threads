@@ -41,7 +41,7 @@ void sigHandler(int signum) {
 }
 
 char* commands() {
-  char* send = "Commands: \n get all clients \n sendto: clientNum message \n sendto: everyone message \n kick clientname";
+  char* send = "Commands: \n get all clients \n sendto clientNum \n sendto all \n kick clientname";
   return send;
 }
 
@@ -69,6 +69,11 @@ void* handleclient(void* arg) {
   //struct clients *client_val = (struct clients *) client;
 
   int clientsocket = our_arg->our_socket;
+
+  // need a better way to handle this
+  if (clientsocket == -1) {
+    return 0;
+  }
   printf("Socket: %d\n", clientsocket);
 
   while (1) {

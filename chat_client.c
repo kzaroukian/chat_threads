@@ -37,7 +37,7 @@ void* receivemessage(void* arg) {
 		}
 
 		if (k >= 0) {
-			printf("Got from Server: %s\n",line2);
+			printf("Incoming Message: %s\n",line2);
 		}
 
 		if(strncmp(line2, "Quit", 4) == 0) {
