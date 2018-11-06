@@ -41,7 +41,7 @@ void sigHandler(int signum) {
 }
 
 char* commands() {
-  char* send = "Commands: \n get all clients \n sendto clientNum \n sendto all \n kick clientname";
+  char* send = "Commands: \n get all clients - returns all clients \n sendto clientName - send to specific client\n sendto - sends to all \n kick clientname - disconnects a client\n me - returns my username";
   return send;
 }
 
@@ -105,11 +105,25 @@ void* handleclient(void* arg) {
       // char* results = getListOfClients();
       // memcpy(sendVal,results,5000);
       int y = 0;
+      get_clients_vals = getClients();
       for(;y<get_clients_vals->connections_num;y++) {
         char temp[3];
         printf("Username: %s\n",get_clients_vals->client_name[y] );
         memcpy(temp,get_clients_vals->client_name[y],3);
         int u = send(clientsocket, temp, strlen(temp)+1,0);
+
+      }
+    }
+    if(strncmp(line,"me\n",2) == 0) {
+      get_clients_vals = getClients();
+      int y = 0;
+      for(;y<get_clients_vals->connections_num;y++) {
+        if(get_clients_vals->socket[y] == clientsocket)  {
+          char temp[3];
+          memcpy(temp,get_clients_vals->client_name[y],3);
+          int u = send(clientsocket, temp, strlen(temp)+1,0);
+        }
+
 
       }
     }
@@ -125,7 +139,7 @@ void* handleclient(void* arg) {
         printf("Compare Val %d\n", strncmp(match,"all", strlen(match)));
 
         if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
-          printf("ISSA MATCH\n");
+          //printf("ISSA MATCH\n");
           send_socket = get_clients_vals->socket[y];
         }
         //char temp[3];
@@ -171,40 +185,40 @@ void* handleclient(void* arg) {
       int y = 0;
       int index = 0;
       for(;y<get_clients_vals->connections_num;y++) {
-        printf("Compare Val %d\n", strncmp(match,"all", strlen(match)));
+        printf("Compare Val All %d\n", strncmp(match,"all", strlen(match)));
 
         if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
           printf("ISSA MATCH\n");
           send_socket = get_clients_vals->socket[y];
           index = y;
         }
+    }
 
-        if (send_socket > 0) {
-          char* temp = "Please enter the password";
-          int u = send(clientsocket, temp, strlen(temp)+1,0);
-          // block till we get our message
-          int s = 0;
-          char ans[5000];
-          while(s < 1) {
-            s = recv(clientsocket,ans,5000,0);
-            printf("RECV val: %d\n", s);
-          }
-          if(strncmp(ans,password,6) == 0) {
-            get_clients_vals->socket[index] = -1;
-            printf("Closing Socket at %s\n", get_clients_vals->client_name[index]);
+    if (send_socket > 0) {
+      char* temp = "Please enter the password";
+      int u = send(clientsocket, temp, strlen(temp)+1,0);
+      // block till we get our message
+      int s = 0;
+      char ans[5000];
+      while(s < 1) {
+        s = recv(clientsocket,ans,5000,0);
+        printf("RECV val: %d\n", s);
+      }
+      if(strncmp(ans,password,6) == 0) {
+        get_clients_vals->socket[index] = -1;
+        printf("Closing Socket at %s\n", get_clients_vals->client_name[index]);
 
-            //get_clients_vals->client_name[index] = "";
-            memcpy(get_clients_vals->client_name[index],"",5);
-            char* exit = "escape_msg";
+        //get_clients_vals->client_name[index] = "";
+        memcpy(get_clients_vals->client_name[index],"",5);
+        char* exit = "escape_msg";
 
-            // send message to client to let them know we're closing them
-            int f = send(send_socket,exit,strlen(exit)+1,0);
-            //close(send_socket);
+        // send message to client to let them know we're closing them
+        int f = send(send_socket,exit,strlen(exit)+1,0);
+        //close(send_socket);
 
-            //break;
-            //continue;
-          }
-        }
+        //break;
+        //continue;
+      }
     }
   }
 
