@@ -8,6 +8,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <pthread.h>
+
 
 int should_exit = 0;
 

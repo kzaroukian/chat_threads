@@ -41,7 +41,7 @@ void sigHandler(int signum) {
 }
 
 char* commands() {
-  char* send = "Commands: \n get all clients - returns all clients \n sendto clientName - send to specific client\n sendto - sends to all \n kick clientname - disconnects a client\n me - returns my username";
+  char* send = "Commands: \n get all clients - returns all clients \n sendto clientName - send to specific client\n sendto - sends to all \n *kick clientname - disconnects a client\n me - returns my username";
   return send;
 }
 
@@ -106,13 +106,16 @@ void* handleclient(void* arg) {
       // memcpy(sendVal,results,5000);
       int y = 0;
       get_clients_vals = getClients();
+      char hold[500] = {0};
       for(;y<get_clients_vals->connections_num;y++) {
-        char temp[3];
+        char temp[4];
+        printf("Loop # %d\n",y );
         printf("Username: %s\n",get_clients_vals->client_name[y] );
         memcpy(temp,get_clients_vals->client_name[y],3);
-        int u = send(clientsocket, temp, strlen(temp)+1,0);
-
+        strcat(temp, " ");
+        strcat(hold,temp);
       }
+      int u = send(clientsocket, hold, strlen(hold)+1,0);
     }
     if(strncmp(line,"me\n",2) == 0) {
       get_clients_vals = getClients();
@@ -175,10 +178,10 @@ void* handleclient(void* arg) {
       }
     }
 
-    if(strncmp(line, "kick", 4) == 0) {
+    if(strncmp(line, "*kick", 5) == 0) {
       printf("Entered kick\n");
       char match[3];
-      memcpy(match,line + 5,3);
+      memcpy(match,line + 6,3);
       u_int send_socket = 0;
       printf("TO: %s\n",match);
       printf("Size: %lu\n", strlen(match));
@@ -301,7 +304,7 @@ int main(int argc, char** argv) {
 
     // only add to struct if we have a successful connection
     memcpy(&connections->client_address[placeholder].s_addr, &clientaddr.sin_addr.s_addr,8);
-    connections->connections_num = placeholder+1;
+    connections->connections_num += 1;
     connections->socket[placeholder] = clientsocket;
     char temp[5];
     sprintf(temp, "u%d",placeholder);
