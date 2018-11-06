@@ -77,6 +77,7 @@ void* handleclient(void* arg) {
     get_clients_vals = getClients();
     //memcpy(&client_val)
     // means we need to destroy this thread
+    // this only closes the thread doesn't delete it
     if (strncmp(line,"disconnecting_client",20) == 0) {
       close(clientsocket);
       //kill(getppid(),SIGUSR1);
