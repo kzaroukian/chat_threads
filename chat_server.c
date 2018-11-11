@@ -157,7 +157,9 @@ void* handleclient(void* arg) {
       char encrypted_key[32];
       while (r < 0) {
         r = recv(clientsocket,encrypted_key,32,0);
+        printf("encrypted key\n");
       }
+      printf("we should have the encrypted key now\n");
 
       // we should have now received the encrypted key
       int decryptedkey_len = rsa_decrypt(encrypted_key, sizeof(encrypted_key), private_key,symmetric_key);
