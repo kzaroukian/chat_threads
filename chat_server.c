@@ -11,6 +11,12 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <signal.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/rand.h>
+#include <openssl/rsa.h>
 
 // struct to hold all connected clients
 struct clients {
@@ -18,6 +24,7 @@ struct clients {
   char client_name[10][5];
   u_int socket[10];
   int connections_num;
+  char symmetric_keys[10][32];
 };
 
 // struct of args to pass and send
@@ -29,6 +36,11 @@ struct args{
 
 struct clients *connections;
 char password[6];
+unsigned char symmetric_key[32];
+
+EVP_PKEY *public_key;
+EVP_PKEY *private_key;
+
 
 struct clients* getClients() {
   return connections;
@@ -60,11 +72,52 @@ char* getListOfClients() {
 
 }
 
+void handleErrors(void)
+{
+  ERR_print_errors_fp(stderr);
+  abort();
+}
+
+int rsa_decrypt(unsigned char* in, size_t inlen, EVP_PKEY *key, unsigned char* out){
+  EVP_PKEY_CTX *ctx;
+  size_t outlen;
+  ctx = EVP_PKEY_CTX_new(key,NULL);
+  if (!ctx)
+    handleErrors();
+  if (EVP_PKEY_decrypt_init(ctx) <= 0)
+    handleErrors();
+  if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING) <= 0)
+    handleErrors();
+  if (EVP_PKEY_decrypt(ctx, NULL, &outlen, in, inlen) <= 0)
+    handleErrors();
+  if (EVP_PKEY_decrypt(ctx, out, &outlen, in, inlen) <= 0)
+    handleErrors();
+  return outlen;
+}
+
+int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+	    unsigned char *iv, unsigned char *plaintext){
+  EVP_CIPHER_CTX *ctx;
+  int len;
+  int plaintext_len;
+  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+  if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    handleErrors();
+  if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+    handleErrors();
+  plaintext_len = len;
+  if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) handleErrors();
+  plaintext_len += len;
+  EVP_CIPHER_CTX_free(ctx);
+  return plaintext_len;
+}
+
 void* handleclient(void* arg) {
   printf("made it into recv thread\n");
   struct args *our_arg = (struct args *) arg;
   struct clients *client_val = (struct clients *)malloc(sizeof(struct clients));
   struct clients *get_clients_vals;
+  unsigned char iv[16];
   //struct clients client = our_arg->client_list;
   //struct clients *client_val = (struct clients *) client;
 
@@ -78,158 +131,222 @@ void* handleclient(void* arg) {
 
   while (1) {
     char line[5000];
+    char decrypted_line[5000];
     int t = recv(clientsocket,line,5000,0);
+
     get_clients_vals = getClients();
+
+    // find our index in the struct
+    int s_index = 0;
+    int z = 0;
+    for(;z < get_clients_vals->connections_num; z++) {
+      if (clientsocket == get_clients_vals->socket[z]) {
+        s_index = z;
+      }
+    }
     //memcpy(&client_val)
-    // means we need to destroy this thread
-    // this only closes the thread doesn't delete it
-    if (strncmp(line,"disconnecting_client",20) == 0) {
-      close(clientsocket);
-      //kill(getppid(),SIGUSR1);
-      return 0;
 
-    }
-    printf("Got from client: %s\n", line);
-    printf("Total Connections: %d\n", get_clients_vals->connections_num);
-    printf("Socket 1: %d\n", get_clients_vals->socket[0]);
-    printf("Socket 2: %d\n", get_clients_vals->socket[1]);
-
-
-    char sendVal[5000];
-    if(strncmp(line, "commands",8) == 0){
-      char* results = commands();
-      memcpy(sendVal,results,5000);
-      int u = send(clientsocket, sendVal, strlen(sendVal)+1,0);
-    }
-    if(strncmp(line, "get all clients\n", 15) == 0) {
-      // char* results = getListOfClients();
-      // memcpy(sendVal,results,5000);
-      int y = 0;
-      get_clients_vals = getClients();
-      char hold[500] = {0};
-      for(;y<get_clients_vals->connections_num;y++) {
-        char temp[4];
-        printf("Loop # %d\n",y );
-        printf("Username: %s\n",get_clients_vals->client_name[y] );
-        memcpy(temp,get_clients_vals->client_name[y],3);
-        strcat(temp, " ");
-        strcat(hold,temp);
+    // first thing we receive should be the encrypted key
+    // but just in case we'll block
+    if(strncmp(line,"~key",4) == 0) {
+      // the key should be sent next
+      // block till we get our key
+      // each thread needs a different key
+      int r = -1;
+      char encrypted_key[32];
+      while (r < 0) {
+        r = recv(clientsocket,encrypted_key,32,0);
       }
-      int u = send(clientsocket, hold, strlen(hold)+1,0);
-    }
-    if(strncmp(line,"me\n",2) == 0) {
-      get_clients_vals = getClients();
-      int y = 0;
-      for(;y<get_clients_vals->connections_num;y++) {
-        if(get_clients_vals->socket[y] == clientsocket)  {
-          char temp[3];
+
+      // we should have now received the encrypted key
+      int decryptedkey_len = rsa_decrypt(encrypted_key, sizeof(encrypted_key), private_key,symmetric_key);
+
+      // now we have the decrypted symmetric key!
+      memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
+    } else {
+      // we already have the decrypted key
+      int m = -1;
+
+      // now we should receive the iv
+      while(m < 0) {
+        m = recv(clientsocket,iv,16,0);
+      }
+
+      // lets decrypt the message sent
+      int decryptedline_len = decrypt(line, sizeof(line), symmetric_key, iv, decrypted_line);
+
+
+      // means we need to destroy this thread
+      // this only closes the thread doesn't delete it
+      if (strncmp(decrypted_line,"disconnecting_client",20) == 0) {
+        close(clientsocket);
+        //kill(getppid(),SIGUSR1);
+        return 0;
+
+      }
+      printf("Got from client: %s\n", decrypted_line);
+      printf("Total Connections: %d\n", get_clients_vals->connections_num);
+      printf("Socket 1: %d\n", get_clients_vals->socket[0]);
+      printf("Socket 2: %d\n", get_clients_vals->socket[1]);
+
+
+      char sendVal[5000];
+      if(strncmp(decrypted_line, "commands",8) == 0){
+        char* results = commands();
+        memcpy(sendVal,results,5000);
+        int u = send(clientsocket, sendVal, strlen(sendVal)+1,0);
+      }
+      if(strncmp(decrypted_line, "get all clients\n", 15) == 0) {
+        // char* results = getListOfClients();
+        // memcpy(sendVal,results,5000);
+        int y = 0;
+        get_clients_vals = getClients();
+        char hold[500] = {0};
+        for(;y<get_clients_vals->connections_num;y++) {
+          char temp[4];
+          printf("Loop # %d\n",y );
+          printf("Username: %s\n",get_clients_vals->client_name[y] );
           memcpy(temp,get_clients_vals->client_name[y],3);
+          strcat(temp, " ");
+          strcat(hold,temp);
+        }
+        int u = send(clientsocket, hold, strlen(hold)+1,0);
+      }
+      if(strncmp(decrypted_line,"me\n",2) == 0) {
+        get_clients_vals = getClients();
+        int y = 0;
+        for(;y<get_clients_vals->connections_num;y++) {
+          if(get_clients_vals->socket[y] == clientsocket)  {
+            char temp[3];
+            memcpy(temp,get_clients_vals->client_name[y],3);
+            int u = send(clientsocket, temp, strlen(temp)+1,0);
+          }
+
+
+        }
+      }
+
+      if(strncmp(decrypted_line,"sendto",6) == 0){
+        char match[3];
+        memcpy(match,decrypted_line + 7,3);
+        u_int send_socket = 0;
+        printf("TO: %s\n",match);
+        printf("Size: %lu\n", strlen(match));
+        int y = 0;
+        for(;y<get_clients_vals->connections_num;y++) {
+          printf("Compare Val %d\n", strncmp(match,"all", strlen(match)));
+
+          if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
+            //printf("ISSA MATCH\n");
+            send_socket = get_clients_vals->socket[y];
+          }
+
+        }
+        if (send_socket > 0) {
+          char* temp = "What message would you like to send?";
           int u = send(clientsocket, temp, strlen(temp)+1,0);
+          // block till we get our message
+          int s = 0;
+          char ans[5000];
+          char decrypted_ans[5000];
+          char iv2[16];
+          // need to decrypt this
+          while(s < 1) {
+            s = recv(clientsocket,ans,5000,0);
+          }
+          int b = -1;
+          while (b < 1) {
+            b = recv(clientsocket,iv2,32,0);
+          }
+
+          // now we decrypt the msg
+          int decryptedans_len = decrypt(ans, sizeof(ans), symmetric_key, iv2, decrypted_ans);
+
+          send(send_socket, decrypted_ans, strlen(decrypted_ans)+1,0);
+        } else if(strncmp(match,"all", strlen(match)) == 0) {
+          char* temp = "What message would you like to send?";
+          int u = send(clientsocket, temp, strlen(temp)+1,0);
+          int s = 0;
+          char ans[5000];
+          char decrypted_ans[5000];
+          char iv2[16];
+
+          while(s < 1) {
+            s = recv(clientsocket,ans,5000,0);
+          }
+          int b = -1;
+          while (b < 1) {
+            b = recv(clientsocket,iv2,32,0);
+          }
+          // now we decrypt the msg
+          int decryptedans_len = decrypt(ans, sizeof(ans), symmetric_key, iv2, decrypted_ans);
+
+          int o = 0;
+          for(;o<get_clients_vals->connections_num; o++) {
+            if(get_clients_vals->socket[o] > 0) {
+              int p = send(get_clients_vals->socket[o],decrypted_ans, strlen(decrypted_ans)+1,0);
+            }
+          }
+
         }
-
-
       }
-    }
 
-    if(strncmp(line,"sendto",6) == 0){
-      char match[3];
-      memcpy(match,line + 7,3);
-      u_int send_socket = 0;
-      printf("TO: %s\n",match);
-      printf("Size: %lu\n", strlen(match));
-      int y = 0;
-      for(;y<get_clients_vals->connections_num;y++) {
-        printf("Compare Val %d\n", strncmp(match,"all", strlen(match)));
+      if(strncmp(decrypted_line, "*kick", 5) == 0) {
+        printf("Entered kick\n");
+        char match[3];
+        memcpy(match,decrypted_line + 6,3);
+        u_int send_socket = 0;
+        printf("TO: %s\n",match);
+        printf("Size: %lu\n", strlen(match));
+        int y = 0;
+        int index = 0;
+        for(;y<get_clients_vals->connections_num;y++) {
+          printf("Compare Val All %d\n", strncmp(match,"all", strlen(match)));
 
-        if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
-          //printf("ISSA MATCH\n");
-          send_socket = get_clients_vals->socket[y];
-        }
-        //char temp[3];
-        //printf("Username: %s\n",get_clients_vals->client_name[y] );
-        //memcpy(temp,get_clients_vals->client_name[y],3);
-
+          if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
+            printf("ISSA MATCH\n");
+            send_socket = get_clients_vals->socket[y];
+            index = y;
+          }
       }
+
       if (send_socket > 0) {
-        char* temp = "What message would you like to send?";
+        char* temp = "Please enter the password";
         int u = send(clientsocket, temp, strlen(temp)+1,0);
         // block till we get our message
         int s = 0;
         char ans[5000];
         while(s < 1) {
           s = recv(clientsocket,ans,5000,0);
+          printf("RECV val: %d\n", s);
         }
-        send(send_socket, ans, strlen(ans)+1,0);
-      } else if(strncmp(match,"all", strlen(match)) == 0) {
-        char* temp = "What message would you like to send?";
-        int u = send(clientsocket, temp, strlen(temp)+1,0);
-        int s = 0;
-        char ans[5000];
-        while(s < 1) {
-          s = recv(clientsocket,ans,5000,0);
-        }
-        int o = 0;
-        for(;o<get_clients_vals->connections_num; o++) {
-          if(get_clients_vals->socket[o] > 0) {
-            int p = send(get_clients_vals->socket[o],ans, strlen(ans)+1,0);
-          }
-        }
+        if(strncmp(ans,password,6) == 0) {
+          get_clients_vals->socket[index] = -1;
+          printf("Closing Socket at %s\n", get_clients_vals->client_name[index]);
 
+          //get_clients_vals->client_name[index] = "";
+          memcpy(get_clients_vals->client_name[index],"",5);
+          char* exit = "escape_msg";
+
+          // send message to client to let them know we're closing them
+          int f = send(send_socket,exit,strlen(exit)+1,0);
+          //close(send_socket);
+
+          //break;
+          //continue;
+        }
       }
     }
 
-    if(strncmp(line, "*kick", 5) == 0) {
-      printf("Entered kick\n");
-      char match[3];
-      memcpy(match,line + 6,3);
-      u_int send_socket = 0;
-      printf("TO: %s\n",match);
-      printf("Size: %lu\n", strlen(match));
-      int y = 0;
-      int index = 0;
-      for(;y<get_clients_vals->connections_num;y++) {
-        printf("Compare Val All %d\n", strncmp(match,"all", strlen(match)));
-
-        if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
-          printf("ISSA MATCH\n");
-          send_socket = get_clients_vals->socket[y];
-          index = y;
-        }
-    }
-
-    if (send_socket > 0) {
-      char* temp = "Please enter the password";
-      int u = send(clientsocket, temp, strlen(temp)+1,0);
-      // block till we get our message
-      int s = 0;
-      char ans[5000];
-      while(s < 1) {
-        s = recv(clientsocket,ans,5000,0);
-        printf("RECV val: %d\n", s);
+      if(strncmp(decrypted_line, "Quit\n", 4) == 0) {
+        printf("Quit sent\n");
+        close(clientsocket);
+        return 0;
       }
-      if(strncmp(ans,password,6) == 0) {
-        get_clients_vals->socket[index] = -1;
-        printf("Closing Socket at %s\n", get_clients_vals->client_name[index]);
 
-        //get_clients_vals->client_name[index] = "";
-        memcpy(get_clients_vals->client_name[index],"",5);
-        char* exit = "escape_msg";
-
-        // send message to client to let them know we're closing them
-        int f = send(send_socket,exit,strlen(exit)+1,0);
-        //close(send_socket);
-
-        //break;
-        //continue;
-      }
     }
-  }
 
-    if(strncmp(line, "Quit\n", 4) == 0) {
-      printf("Quit sent\n");
-      close(clientsocket);
-      return 0;
-    }
+
   }
 }
 
@@ -258,7 +375,14 @@ int main(int argc, char** argv) {
   int i = 1;
   connections = (struct clients*)malloc(sizeof(struct clients));
   memcpy(password, "monday",6);
+  OpenSSL_add_all_algorithms();
 
+  // from cryptotest.c
+  FILE* pubkey_file = fopen("RSApub.pem","rb");
+  FILE* privkey_file = fopen("RSApriv.pem","rb");
+  // generates the public key
+  public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
+  private_key = PEM_read_PrivateKey(privf,NULL,NULL,NULL);
 
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -350,6 +474,9 @@ int main(int argc, char** argv) {
 
     pthread_create(&send, NULL, handleserver, args_to_pass);
     pthread_detach(send);
+
+    EVP_cleanup();
+    ERR_free_strings();
 
 
 	}

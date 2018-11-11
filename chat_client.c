@@ -9,14 +9,82 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <pthread.h>
+#include <openssl/conf.h>
+#include <openssl/evp.h>
+#include <openssl/err.h>
+#include <openssl/pem.h>
+#include <openssl/rand.h>
+#include <openssl/rsa.h>
 
 
 int should_exit = 0;
+unsigned char symmetric_key[32];
+unsigned char iv[16];
+// servers public key
+EVP_PKEY *public_key
 
 void sigHandler(int signum) {
 	if (signum == SIGUSR1) {
 		exit(1);
 	}
+}
+
+void handleErrors(void)
+{
+  ERR_print_errors_fp(stderr);
+  abort();
+}
+
+int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
+	    unsigned char *iv, unsigned char *plaintext){
+  EVP_CIPHER_CTX *ctx;
+  int len;
+  int plaintext_len;
+  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+  if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    handleErrors();
+  if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+    handleErrors();
+  plaintext_len = len;
+  if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) handleErrors();
+  plaintext_len += len;
+  EVP_CIPHER_CTX_free(ctx);
+  return plaintext_len;
+}
+
+// encrypts with rsa public key
+int rsa_encrypt(unsigned char* in, size_t inlen, EVP_PKEY *key, unsigned char* out){
+  EVP_PKEY_CTX *ctx;
+  size_t outlen;
+  ctx = EVP_PKEY_CTX_new(key, NULL);
+  if (!ctx)
+    handleErrors();
+  if (EVP_PKEY_encrypt_init(ctx) <= 0)
+    handleErrors();
+  if (EVP_PKEY_CTX_set_rsa_padding(ctx, RSA_PKCS1_OAEP_PADDING) <= 0)
+    handleErrors();
+  if (EVP_PKEY_encrypt(ctx, NULL, &outlen, in, inlen) <= 0)
+    handleErrors();
+  if (EVP_PKEY_encrypt(ctx, out, &outlen, in, inlen) <= 0)
+    handleErrors();
+  return outlen;
+}
+
+int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+	unsigned char *iv, unsigned char *ciphertext){
+  EVP_CIPHER_CTX *ctx;
+  int len;
+  int ciphertext_len;
+  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+  if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    handleErrors();
+  if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+    handleErrors();
+  ciphertext_len = len;
+  if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
+  ciphertext_len += len;
+  EVP_CIPHER_CTX_free(ctx);
+  return ciphertext_len;
 }
 
 void* receivemessage(void* arg) {
@@ -26,9 +94,14 @@ void* receivemessage(void* arg) {
 		char line2[5000];
 		int k = recv(serversocket,line2,5000,0);
 
+		// now we decrypt the message
+		//char decrypted_text[5000];
+		//int decryptedtext_len = decrypt(line2, strlen(line2+1), )
+
 		if (strncmp(line2,"escape_msg",10) == 0) {
 			printf("its a trap\n");
 			char* close_message = "disconnecting_client";
+			
 			int x=send(serversocket,close_message,strlen(close_message)+1,0);
 			close(serversocket);
 
@@ -54,6 +127,7 @@ void* receivemessage(void* arg) {
 
 int main(int argc, char** argv){
 	should_exit = 0;
+
 	// we will need to create more than one socket?
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 	if(sockfd < 0) {
@@ -82,7 +156,40 @@ int main(int argc, char** argv){
 		return 2;
 	}
 
+	OpenSSL_add_all_algorithms();
+
+  // from cryptotest.c
+	FILE* pubkey_file = fopen("RSApub.pem","rb");
+	// generates the public key
+	public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
+	// only want to randomly generate symmetric key once
+	RAND_bytes(symmetric_key,32);
+
+	// encrypted key to send
+	unsigned char encrypted_key[256];
+
+	// encrypt our symmetric key using the RSA public public_key
+	int encryptedkey_len = rsa_encrypt(symmetric_key, 32, public_key, encrypted_key);
+	// now we send the encrypted key to the server
+	// should we send a warning message first?
+
+	char* key_msg = "~key";
+	int r = send(sockfd,key_msg,strlen(key_msg)+1,0);
+	int c= -1;
+
+	// blocks till the key is sent
+	while (c < 0) {
+		c = send(sockfd,encrypted_key,encryptedkey_len+1,0);
+	}
+	if (c == 0) {
+		printf("ERROR key unable to be sent\n");
+		return 3;
+	}
+
 	while(1) {
+
+		// randomly generates a iv everytime we send a message
+		RAND_bytes(iv,16);
 
 		pthread_t receive;
 
@@ -99,13 +206,28 @@ int main(int argc, char** argv){
 		printf("Enter a line: ");
 		char line[5000];
 		fgets(line,5000,stdin);
-		int x=send(sockfd,line,strlen(line)+1,0);
+
+		// encrypt the message we're sending
+		char encrypted_text[5000]
+		int encryptedtxt_len = encrypt(line, sizeof(line), symmetric_key, iv, encrypted_text);
+
+		//int x=send(sockfd,line,strlen(line)+1,0);
+		// send the encrypted text
+		int x=send(sockfd,encrypted_text,encryptedtxt_len,0);
+		// send the encrypted message & then send the iv
+		int u = -1;
+		// block till the iv is sent
+		while (u<0){
+			u = send(sockfd,iv,strlen(iv)+1,0);
+		}
 
 		if(strncmp(line, "Quit\n", 4) == 0) {
 			close(sockfd);
 			return 0;
 
 		}
+		EVP_cleanup();
+	  ERR_free_strings();
 	}
 
 
