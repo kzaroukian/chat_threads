@@ -174,12 +174,14 @@ int main(int argc, char** argv){
 	// should we send a warning message first?
 
 	char* key_msg = "~key";
+	printf("sending key msg\n");
 	int r = send(sockfd,key_msg,strlen(key_msg)+1,0);
 	int c= -1;
 
 	// blocks till the key is sent
 	while (c < 0) {
 		c = send(sockfd,encrypted_key,encryptedkey_len+1,0);
+		printf("sending encrypted key");
 	}
 	if (c == 0) {
 		printf("ERROR key unable to be sent\n");
