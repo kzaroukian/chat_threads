@@ -21,7 +21,7 @@ int should_exit = 0;
 unsigned char symmetric_key[32];
 unsigned char iv[16];
 // servers public key
-EVP_PKEY *public_key
+EVP_PKEY *public_key;
 
 void sigHandler(int signum) {
 	if (signum == SIGUSR1) {
@@ -101,7 +101,7 @@ void* receivemessage(void* arg) {
 		if (strncmp(line2,"escape_msg",10) == 0) {
 			printf("its a trap\n");
 			char* close_message = "disconnecting_client";
-			
+
 			int x=send(serversocket,close_message,strlen(close_message)+1,0);
 			close(serversocket);
 
@@ -208,7 +208,7 @@ int main(int argc, char** argv){
 		fgets(line,5000,stdin);
 
 		// encrypt the message we're sending
-		char encrypted_text[5000]
+		char encrypted_text[5000];
 		int encryptedtxt_len = encrypt(line, sizeof(line), symmetric_key, iv, encrypted_text);
 
 		//int x=send(sockfd,line,strlen(line)+1,0);
