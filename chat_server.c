@@ -153,7 +153,7 @@ void* handleclient(void* arg) {
       // the key should be sent next
       // block till we get our key
       // each thread needs a different key
-      int r = -1;
+      //int r = -1;
       char encrypted_key[32];
       // while (r < 0) {
       //   r = recv(clientsocket,encrypted_key,32,0);
