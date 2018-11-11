@@ -382,7 +382,7 @@ int main(int argc, char** argv) {
   FILE* privkey_file = fopen("RSApriv.pem","rb");
   // generates the public key
   public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
-  private_key = PEM_read_PrivateKey(privf,NULL,NULL,NULL);
+  private_key = PEM_read_PrivateKey(privkey_file,NULL,NULL,NULL);
 
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
 
