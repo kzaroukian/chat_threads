@@ -149,6 +149,7 @@ void* handleclient(void* arg) {
     // first thing we receive should be the encrypted key
     // but just in case we'll block
     if(strncmp(line,"~key",4) == 0) {
+      printf("key\n");
       // the key should be sent next
       // block till we get our key
       // each thread needs a different key
