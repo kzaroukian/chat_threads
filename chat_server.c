@@ -156,6 +156,7 @@ void* handleclient(void* arg) {
       //int r = -1;
       char encrypted_key[32];
       memcpy(encrypted_key,line+4,32);
+      printf("encrypted key: %s\n", encrypted_key);
       // while (r < 0) {
       //   r = recv(clientsocket,encrypted_key,32,0);
       //   printf("encrypted key\n");
@@ -165,6 +166,7 @@ void* handleclient(void* arg) {
 
       // we should have now received the encrypted key
       int decryptedkey_len = rsa_decrypt(encrypted_key, sizeof(encrypted_key), private_key,symmetric_key);
+      printf("RSA decrypt isn;t the prob\n");
 
       // now we have the decrypted symmetric key!
       memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
