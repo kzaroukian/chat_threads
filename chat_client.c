@@ -231,6 +231,7 @@ int main(int argc, char** argv){
 
 		printf("encrypting\n");
 		char encrypted_text[5000];
+		printf("symmetric key %s \n", symmetric_key);
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
 
 
