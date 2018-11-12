@@ -769,7 +769,7 @@ void* handleclient(void* arg) {
         // char ans_len[3];
         // memcpy(ans_len, ans, 3);
         int ans_encrypt_len = 0;
-        memcpy(ans_encrypt_len, ans, 4);
+        memcpy(&ans_encrypt_len, ans, 4);
         //printf("Num: %d\n", ans_len);
         memcpy(iv2, ans+4, 16);
         printf("iv: %s\n", iv2);
