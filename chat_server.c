@@ -355,7 +355,7 @@ void* handleclient(void* arg) {
         printf("TEST: %s\n", test);
         unsigned char final_encrypt[encryptedtxt_len];
         memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
-        //final_encrypt[encryptedtxt_len] = '\0';
+        final_encrypt[encryptedtxt_len] = '\0';
         printf("ENCRYPTION: %s\n", final_encrypt);
         strcat(final,num_char);
         strcat(final,test);
