@@ -211,12 +211,6 @@ int main(int argc, char** argv){
 
 		// send message
 		// randomly generates a iv everytime we send a message
-		RAND_bytes(iv,16);
-		printf("IV %s\n",iv );
-
-		printf("encrypting\n");
-		char encrypted_text[5000];
-		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
 
 		pthread_t receive;
 
@@ -232,6 +226,14 @@ int main(int argc, char** argv){
 		char line[5000];
 		fgets(line,5000,stdin);
 
+		RAND_bytes(iv,16);
+		printf("IV %s\n",iv );
+
+		printf("encrypting\n");
+		char encrypted_text[5000];
+		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
+
+
 		printf("encrypted txt: %s\n", encrypted_text);
 		printf("encrypt length: %d\n", encryptedtxt_len);
 		char encrypt_and_iv[encryptedtxt_len+16];
@@ -239,7 +241,7 @@ int main(int argc, char** argv){
 		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
-		
+
 		//int r = send(sockfd, line, 5000, 0);
 
 		// encrypt the message we're sending
