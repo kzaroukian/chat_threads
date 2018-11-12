@@ -317,6 +317,8 @@ void* handleclient(void* arg) {
             char encrypted_text[5000];
             int length = 0;
             encrypt_msg(temp, encrypted_text, length);
+            printf("encrypted_text %s\n", encrypted_text);
+            printf("length %d\n", length);
             int u = send(clientsocket, encrypted_text, length+19,0);
           }
 
