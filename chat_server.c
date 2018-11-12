@@ -371,9 +371,9 @@ void* handleclient(void* arg) {
         printf("PLZ WORK: %s\n", plz_work);
 
 
-        memcpy(encrypt_and_iv, num_char, 3);
-        memcpy(&encrypt_and_iv[3], test, 16);
-        memcpy(encrypt_and_iv+19, encrypted_text, encryptedtxt_len);
+        strncpy(encrypt_and_iv, num_char, 3);
+        strncpy(encrypt_and_iv+3, test, 16);
+        strncpy(encrypt_and_iv+19, encrypted_text, encryptedtxt_len);
         printf("encrypt_and_iv: %s\n", encrypt_and_iv);
         printf("sizeof %d\n", sizeof(encrypt_and_iv));
         // encrypt_and_iv[encryptedtxt_len+19] = '\0';
