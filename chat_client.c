@@ -226,6 +226,12 @@ int main(int argc, char** argv){
 
 		//int x=send(sockfd,line,strlen(line)+1,0);
 		// send the encrypted text
+
+
+		printf("Enter a line: ");
+		char line[5000];
+		fgets(line,5000,stdin);
+
 		printf("encrypted txt: %s\n", encrypted_text);
 		printf("encrypt length: %d\n", encryptedtxt_len);
 		char encrypt_and_iv[encryptedtxt_len+16];
@@ -233,11 +239,8 @@ int main(int argc, char** argv){
 		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
-
-		printf("Enter a line: ");
-		char line[5000];
-		fgets(line,5000,stdin);
-		int r = send(sockfd, line, 5000, 0);
+		
+		//int r = send(sockfd, line, 5000, 0);
 
 		// encrypt the message we're sending
 
