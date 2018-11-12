@@ -133,7 +133,7 @@ void* handleclient(void* arg) {
   //send(clientsocket, public_key, sizeof(public_key),0);
 
   while (1) {
-    char line[36];
+    char line[5000];
     char decrypted_line[5000];
     int t = recv(clientsocket,line,5000,0);
 

@@ -182,12 +182,12 @@ int main(int argc, char** argv){
 	// should we send a warning message first?
 
 	char* key_msg = "~key";
-	char complete_key_msg[36];
+	char complete_key_msg[5000];
 	printf("sending key msg\n");
 	printf("encrypted_key: %s\n", encrypted_key);
 	memcpy(complete_key_msg,key_msg,4);
 	memcpy(complete_key_msg + 4,encrypted_key,32);
-	int r = send(sockfd,complete_key_msg,36,0);
+	int r = send(sockfd,complete_key_msg,5000,0);
 	// int c= -1;
 
 	// // blocks till the key is sent
