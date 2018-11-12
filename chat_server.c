@@ -129,6 +129,9 @@ void* handleclient(void* arg) {
   }
   printf("Socket: %d\n", clientsocket);
 
+  // as soon as client connects send the public RSA key
+  send(client_socket, public_key, sizeof(public_key),0);
+
   while (1) {
     char line[5000];
     char decrypted_line[5000];
