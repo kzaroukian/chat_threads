@@ -830,8 +830,8 @@ void* handleclient(void* arg) {
 
           // send message to client to let them know we're closing them
           int f = send(send_socket,encryptmsg_and_iv,encryptedmsg_len+20,0);
-          close(send_socket);
-          return 0;
+          //close(send_socket);
+          //return 0;
 
           //break;
           //continue;
