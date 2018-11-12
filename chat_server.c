@@ -182,7 +182,6 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
   memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
   printf("encrypt_and_iv: %s\n", encrypt_and_iv);
   //encrypt_and_iv[encryptedtxt_len+19] = '\0
-  BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
 
   memcpy(encrypt_txt,encrypt_and_iv,encryptedtxt_len+19);
 
@@ -385,6 +384,10 @@ void* handleclient(void* arg) {
 
 
         printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
+
+        printf("BIO DUMP\n");
+        BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+
         // int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
         int u = send(clientsocket, final, encryptedtxt_len+19+1,0);
