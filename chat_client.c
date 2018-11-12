@@ -213,19 +213,8 @@ int main(int argc, char** argv){
 		// randomly generates a iv everytime we send a message
 		RAND_bytes(iv,16);
 		printf("IV %s\n",iv );
-		printf("Enter a line: ");
-		char line[5000];
-		fgets(line,5000,stdin);
 
-		// encrypt the message we're sending
-
-		int v = send(sockfd,iv,16,0);
-		int e = 0;
-		char res[5000];
-		// now block till we know server got the iv
-		while(e < 1) {
-			e = recv(sockfd,res,sizeof(res),0);
-		}
+		printf("encrypting\n");
 		char encrypted_text[5000];
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
 
@@ -243,7 +232,23 @@ int main(int argc, char** argv){
 		memcpy(encrypt_and_iv, iv, 16);
 		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-		int x=send(sockfd,encrypted_text,encryptedtxt_len,0);
+		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
+
+		printf("Enter a line: ");
+		char line[5000];
+		fgets(line,5000,stdin);
+		int r = send(sockfd, line, 5000, 0);
+
+		// encrypt the message we're sending
+
+		//int v = send(sockfd,iv,16,0);
+		//int e = 0;
+		// char res[5000];
+		// // now block till we know server got the iv
+		// while(e < 1) {
+		// 	e = recv(sockfd,res,sizeof(res),0);
+		// }
+
 		// send the encrypted message & then send the iv
 		// int u = -1;
 		// // block till the iv is sent
