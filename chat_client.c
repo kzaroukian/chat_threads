@@ -135,6 +135,8 @@ void* receivemessage(void* arg) {
 		char decrypted_line[5000];
 		char len_res[3];
 		unsigned char iv2[16];
+
+		printf("Decrypting:\n");
 		memcpy(len_res, line, 3);
 		int encrypt_length = atoi(len_res);
 		printf("Num: %d\n", encrypt_length);
