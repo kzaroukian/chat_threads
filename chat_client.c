@@ -173,24 +173,24 @@ void* receivemessage(void* arg) {
 			// int length = 0;
 			// encrypt_msg(close_message,encrypt, length);
 			char encrypted_text[5000];
-			unsigned char iv2[16];
+			unsigned char iv1[16];
 
-			RAND_bytes(iv2,16);
-			printf("IV %s\n",iv2 );
+			RAND_bytes(iv1,16);
+			printf("IV %s\n",iv1 );
 
 			printf("symmetric key %s \n", symmetric_key);
-			int encryptedtxt_len = encrypt(hold, strlen(hold), symmetric_key, iv2, encrypted_text);
+			int encryptedtxt_len = encrypt(hold, strlen(hold), symmetric_key, iv1, encrypted_text);
 
 			char num_char[3];
 
 			printf("encrypted txt: %s\n", encrypted_text);
 			printf("encrypt length: %d\n", encryptedtxt_len);
-			unsigned char encrypt_and_iv[encryptedtxt_len+19];
+			unsigned char encrypt_and_iv[encryptedtxt_len+20];
 
 			int val = encryptedtxt_len+19;
 			char final[35] = {0};
 			unsigned char test[16];
-			memcpy(test,iv2,16);
+			memcpy(test,iv1,16);
 
 			unsigned char final_encrypt[encryptedtxt_len];
 
@@ -198,11 +198,11 @@ void* receivemessage(void* arg) {
 			final_encrypt[encryptedtxt_len] = '\0';
 
 			memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
-			memcpy(encrypt_and_iv+4, iv2, 16);
+			memcpy(encrypt_and_iv+4, iv1, 16);
 			memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
 
 			printf("IV\n" );
-			BIO_dump_fp(stdout, iv2, 16);
+			BIO_dump_fp(stdout, iv1, 16);
 
 
 			printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
