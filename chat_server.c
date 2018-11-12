@@ -349,6 +349,7 @@ void* handleclient(void* arg) {
         memcpy(encrypt_and_iv+3, iv2, 16);
         memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
         printf("encrypt_and_iv: %s\n", encrypt_and_iv);
+        printf("sizeof %d\n", sizeof(encrypt_and_iv));
         // encrypt_and_iv[encryptedtxt_len+19] = '\0';
         encrypt_and_iv[64] = '\0';
 
