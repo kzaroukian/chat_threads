@@ -246,16 +246,17 @@ void* handleclient(void* arg) {
 
       // once we get the iv get the encrypted msg
       char len_res[3];
-      memcpy(len_res, line, 3);
-      int encrypt_length = atoi(len_res);
+      int encrypt_length = 0;
+      memcpy(&encrypt_length, line, 4);
+
       //printf("Num: %d\n", encrypt_length);
-      memcpy(iv, line+3, 16);
+      memcpy(iv, line+4, 16);
       //printf("iv: %s\n", iv);
       char no_iv[5000];
 
       int r = 0;
 
-      memcpy(no_iv,line+19,5000);
+      memcpy(no_iv,line+20,5000);
       //printf("no iv: %s\n", no_iv);
       //printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
@@ -528,14 +529,15 @@ void* handleclient(void* arg) {
           printf("starting decryption \n");
           char ans_len[3];
           unsigned char iv2[16];
-          memcpy(ans_len, ans, 3);
-          int ans_encrypt_len = atoi(ans_len);
+
+          int ans_encrypt_length = 0;
+          memcpy(&ans_encrypt_length, ans, 4);
           //printf("Num: %d\n", ans_len);
-          memcpy(iv2, ans+3, 16);
+          memcpy(iv2, ans+4, 16);
         //  printf("iv: %s\n", iv2);
           char no_iv2[5000];
 
-          memcpy(no_iv2,ans+19,5000);
+          memcpy(no_iv2,ans+20,5000);
           //printf("no iv2: %s\n", no_iv2);
 
           int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
@@ -631,8 +633,9 @@ void* handleclient(void* arg) {
           printf("DECRYPTION\n");
 
           char ans_len[3];
-          memcpy(ans_len, ans, 3);
-          int ans_encrypt_len = atoi(ans_len);
+          //memcpy(ans_len, ans, 3);
+          int ans_encrypt_len = 0;
+          memcpy(&ans_encrypt_length, ans, 4);
           //printf("Num: %d\n", ans_len);
           memcpy(iv2, ans+3, 16);
           //printf("iv: %s\n", iv2);
@@ -649,6 +652,7 @@ void* handleclient(void* arg) {
           // char encrypted_text[5000];
           // int length = 0;
           // encrypt_msg(decrypted_ans, encrypted_text, length);
+          printf(" Decrypted char: %s\n", decrypted_ans);
 
           printf("Starting Encryption: \n");
 

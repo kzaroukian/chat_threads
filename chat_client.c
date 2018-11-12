@@ -354,14 +354,14 @@ int main(int argc, char** argv){
 		char encrypt_and_iv[encryptedtxt_len+19];
 	//	char encrypt_len[3];
 		//sprintf(encrypt_len, "%d",encryptedtxt_len);
-		memcpy(encrypt_and_iv, num_char, 3);
-		memcpy(encrypt_and_iv+3, iv, 16);
-		memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
+		memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
+		memcpy(encrypt_and_iv+4, iv, 16);
+		memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-		encrypt_and_iv[encryptedtxt_len+19] = '\0';
+		encrypt_and_iv[encryptedtxt_len+20] = '\0';
 
 		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
-		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
+		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+20,0);
 
 		if(strncmp(line, "Quit\n", 4) == 0) {
 			close(sockfd);
