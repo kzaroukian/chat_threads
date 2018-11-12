@@ -210,6 +210,7 @@ void* handleclient(void* arg) {
 
       // lets decrypt the message sent
       int decryptedline_len = decrypt(no_iv, sizeof(no_iv), symmetric_key, iv, decrypted_line);
+      printf("decrypting worked?\n");
 
 
       // means we need to destroy this thread
