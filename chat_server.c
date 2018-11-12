@@ -232,9 +232,9 @@ void* handleclient(void* arg) {
       memcpy(no_iv,line+16,5000);
       printf("no iv: %s\n", no_iv);
       printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
-
+      int fin = strlen(no_iv);
       // lets decrypt the message sent
-      int decrypt_len = round_by_sixteen(strlen(no_iv));
+      int decrypt_len = round_by_sixteen(fin);
       printf("Decrypt length %d\n", decrypt_len);
       int decryptedline_len = decrypt(no_iv, decrypt_len, symmetric_key, iv, decrypted_line);
       printf("decrypting worked?\n");
