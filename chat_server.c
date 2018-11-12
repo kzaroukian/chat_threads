@@ -323,57 +323,57 @@ void* handleclient(void* arg) {
         // now we re-encrypt before sending
         char encrypted_text[5000];
         unsigned char iv2[16];
-        int length = 0;
-        int r = 0;
-        while (r < 1) {
-          r = encrypt_msg(temp, encrypted_text, length);
+        // int length = 0;
+        // int r = 0;
+        // while (r < 1) {
+        //   r = encrypt_msg(temp, encrypted_text, length);
+        //
+        // }
+        // printf("encrypted_text %s\n", encrypted_text);
+        // printf("length %d\n", length);
 
-        }
-        printf("encrypted_text %s\n", encrypted_text);
-        printf("length %d\n", length);
+        printf("Temp: %s\n", temp);
+        printf("encrypting\n");
 
-        // printf("Temp: %s\n", temp);
-        // printf("encrypting\n");
+        RAND_bytes(iv2,16);
+        printf("IV %s\n",iv2 );
 
-        // RAND_bytes(iv2,16);
-        // printf("IV %s\n",iv2 );
+        char encrypted_text[5000];
+        printf("symmetric key %s \n", symmetric_key);
+        int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
 
-        //char encrypted_text[5000];
-        //printf("symmetric key %s \n", symmetric_key);
-        // int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
-        //
-        // char num_char[3];
-        //
-        // printf("encrypted txt: %s\n", encrypted_text);
-        // printf("encrypt length: %d\n", encryptedtxt_len);
-        // unsigned char encrypt_and_iv[encryptedtxt_len+19];
-        //
-        // int val = encryptedtxt_len+19;
-        // char final[35] = {0};
-        // unsigned char test[16];
-        // memcpy(test,iv2,16);
-        //
-        // unsigned char final_encrypt[encryptedtxt_len];
-        //
-        // memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
-        // final_encrypt[encryptedtxt_len] = '\0';
-        //
-        // memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
-        // memcpy(encrypt_and_iv+4, iv2, 16);
-        // memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
-        //
-        // printf("IV\n" );
-        // BIO_dump_fp(stdout, iv2, 16);
-        //
-        //
-        // printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
-        //
-        // printf("BIO DUMP\n");
-        // BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+        char num_char[3];
 
-        // int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
+        printf("encrypted txt: %s\n", encrypted_text);
+        printf("encrypt length: %d\n", encryptedtxt_len);
+        unsigned char encrypt_and_iv[encryptedtxt_len+19];
 
-        int u = send(clientsocket, encrypted_text,length+20,0);
+        int val = encryptedtxt_len+19;
+        char final[35] = {0};
+        unsigned char test[16];
+        memcpy(test,iv2,16);
+
+        unsigned char final_encrypt[encryptedtxt_len];
+
+        memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
+        final_encrypt[encryptedtxt_len] = '\0';
+
+        memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
+        memcpy(encrypt_and_iv+4, iv2, 16);
+        memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
+
+        printf("IV\n" );
+        BIO_dump_fp(stdout, iv2, 16);
+
+
+        printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
+
+        printf("BIO DUMP\n");
+        BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+
+        int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
+
+        int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
       }
 
       if(strncmp(decrypted_line,"sendto",6) == 0){
