@@ -1,4 +1,4 @@
-// Project 3 Chat Server by Kaylin Zaroukian
+// Project 3 Chat Server by Kaylin Zaroukian 
 
 // NEED TO COMPILE LIKE: gcc threadtcpechoserver.c -lpthread -o s
 
