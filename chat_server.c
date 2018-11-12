@@ -556,6 +556,7 @@ void* handleclient(void* arg) {
           int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
           printf("decrypting worked?\n");
           printf("received from client: %s\n", decrypted_ans);
+          printf("Size of string: %d\n", strlen(decrypted_ans));
 
 
           // now we re-encrypt before sending

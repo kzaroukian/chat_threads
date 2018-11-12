@@ -339,6 +339,8 @@ int main(int argc, char** argv){
 		char line[5000];
 		fgets(line,5000,stdin);
 
+		printf("strlen of what i entered: %d\n", strlen(line));
+
 		RAND_bytes(iv,16);
 		printf("IV %s\n",iv );
 
