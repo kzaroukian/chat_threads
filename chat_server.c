@@ -264,7 +264,7 @@ void* handleclient(void* arg) {
       //printf("no iv: %s\n", no_iv);
       //printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
-      int decryptedline_len = decrypt(no_iv, encrypt_length, symmetric_key, iv, decrypted_line);
+      int decryptedline_len = decrypt(no_iv, encrypt_length, get_clients_vals->symmetric_keys[s_index], iv, decrypted_line);
       printf("decrypting worked?\n");
 
 
@@ -300,7 +300,7 @@ void* handleclient(void* arg) {
       //  printf("IV %s\n",iv2 );
 
       //printf("symmetric key %s \n", symmetric_key);
-        int encryptedtxt_len = encrypt(results, strlen(results), symmetric_key, iv2, encrypted_text);
+        int encryptedtxt_len = encrypt(results, strlen(results), get_clients_vals->symmetric_keys[s_index], iv2, encrypted_text);
 
         char num_char[3];
 
@@ -360,7 +360,7 @@ void* handleclient(void* arg) {
         //printf("IV %s\n",iv2 );
 
         //printf("symmetric key %s \n", symmetric_key);
-        int encryptedtxt_len = encrypt(hold, strlen(hold), symmetric_key, iv2, encrypted_text);
+        int encryptedtxt_len = encrypt(hold, strlen(hold), get_clients_vals->symmetric_keys[s_index], iv2, encrypted_text);
 
         char num_char[3];
 
@@ -429,7 +429,7 @@ void* handleclient(void* arg) {
         //printf("IV %s\n",iv2 );
 
       //  printf("symmetric key %s \n", symmetric_key);
-        int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
+        int encryptedtxt_len = encrypt(temp, strlen(temp), get_clients_vals->symmetric_keys[s_index], iv2, encrypted_text);
 
         char num_char[3];
 
@@ -501,7 +501,7 @@ void* handleclient(void* arg) {
           //printf("IV %s\n",iv1 );
 
           //printf("symmetric key %s \n", symmetric_key);
-          int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv1, encrypted_text);
+          int encryptedtxt_len = encrypt(temp, strlen(temp), get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
 
           char num_char[3];
 
@@ -558,7 +558,7 @@ void* handleclient(void* arg) {
           memcpy(no_iv2,ans+20,s-20);
           //printf("no iv2: %s\n", no_iv2);
 
-          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
+          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
           printf("decrypting worked?\n");
           printf("received from client: %s\n", decrypted_ans);
           printf("Size of string: %d\n", strlen(decrypted_ans));
@@ -619,7 +619,7 @@ void* handleclient(void* arg) {
           //printf("IV %s\n",iv1 );
 
           //printf("symmetric key %s \n", symmetric_key);
-          int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv1, encrypted_text);
+          int encryptedtxt_len = encrypt(temp, strlen(temp),get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
 
           char num_char[3];
 
@@ -665,7 +665,7 @@ void* handleclient(void* arg) {
           memcpy(no_iv2,ans+19,s-20);
           //printf("no iv2: %s\n", no_iv2);
 
-          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
+          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
           printf("decrypting worked?\n");
 
           // now we decrypt the msg
@@ -684,7 +684,7 @@ void* handleclient(void* arg) {
           //printf("IV %s\n",iv_msg);
 
           //printf("symmetric key %s \n", symmetric_key);
-          int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), symmetric_key, iv_msg, encrypted_msg);
+          int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), get_clients_vals->symmetric_keys[s_index], iv_msg, encrypted_msg);
 
           //printf("encrypted txt: %s\n", encrypted_msg);
         //  printf("encrypt length: %d\n", encryptedmsg_len);
@@ -749,7 +749,7 @@ void* handleclient(void* arg) {
       //  printf("IV %s\n",iv1 );
 
       //  printf("symmetric key %s \n", symmetric_key);
-        int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv1, encrypted_text);
+        int encryptedtxt_len = encrypt(temp, strlen(temp), get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
 
         char num_char[3];
 
@@ -794,7 +794,7 @@ void* handleclient(void* arg) {
         memcpy(no_iv2,ans+19,5000);
         printf("no iv2: %s\n", no_iv2);
 
-        int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
+        int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
         printf("decrypting worked?\n");
 
         if(strncmp(decrypted_ans,password,6) == 0) {
@@ -819,7 +819,7 @@ void* handleclient(void* arg) {
           //printf("IV %s\n",iv_msg);
 
           //printf("symmetric key %s \n", symmetric_key);
-          int encryptedmsg_len = encrypt(exit, strlen(exit), symmetric_key, iv_msg, encrypted_msg);
+          int encryptedmsg_len = encrypt(exit, strlen(exit), get_clients_vals->symmetric_keys[s_index], iv_msg, encrypted_msg);
 
           //printf("encrypted txt: %s\n", encrypted_msg);
           //printf("encrypt length: %d\n", encryptedmsg_len);
