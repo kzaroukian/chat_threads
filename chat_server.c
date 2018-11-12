@@ -100,16 +100,22 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   EVP_CIPHER_CTX *ctx;
   int len;
   int plaintext_len;
+  printf("entered decrypt\n");
   if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
   if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)) {
     printf("IF ERROR IS HERE\n");
     handleErrors();
 
   }
-  if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
+  if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len)) {
+    printf("3 if\n");
     handleErrors();
+  }
   plaintext_len = len;
-  if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) handleErrors();
+  if(1 != EVP_DecryptFinal_ex(ctx, plaintext + len, &len)) {
+    printf("3 if\n");
+    handleErrors();
+  }
   plaintext_len += len;
   EVP_CIPHER_CTX_free(ctx);
   return plaintext_len;
