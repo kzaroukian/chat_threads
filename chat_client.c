@@ -134,7 +134,8 @@ void* receivemessage(void* arg) {
 		// once we get the iv get the encrypted msg
 		printf("size: %d\n", k);
 
-		BIO_dump_fp(stdout, line, 36);
+		printf("BIO DUMP:\n");
+		BIO_dump_fp(stdout, line, k);
 
 		char decrypted_line[5000];
 		char len_res[3];
