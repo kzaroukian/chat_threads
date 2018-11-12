@@ -57,6 +57,21 @@ char* commands() {
   return send;
 }
 
+int round_by_sixteen(int len) {
+  int final = 0;
+  int i = 0;
+  while(final < 1) {
+    int low_val = 16 * i;
+    int high_val = 16 * (i + 1);
+    if (len > low_val && len < high_val) {
+      final = high_val;
+
+    }
+  }
+
+  return final;
+}
+
 char* getListOfClients() {
   struct clients *get_clients_vals = getClients();
   printf("Total Connections: %d\n", get_clients_vals->connections_num);
@@ -219,7 +234,8 @@ void* handleclient(void* arg) {
       printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
       // lets decrypt the message sent
-      int decryptedline_len = decrypt(no_iv, 16, symmetric_key, iv, decrypted_line);
+      int decrypt_len = round_by_sixteen(strlen(no_iv));
+      int decryptedline_len = decrypt(no_iv, decrypt_len, symmetric_key, iv, decrypted_line);
       printf("decrypting worked?\n");
 
 
