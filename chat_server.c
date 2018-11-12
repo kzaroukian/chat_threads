@@ -131,8 +131,10 @@ void* handleclient(void* arg) {
 
   // as soon as client connects send the public RSA key
   //send(clientsocket, public_key, sizeof(public_key),0);
-
+  int loop_num = 0;
   while (1) {
+    loop_num += 1;
+    printf("Iteration: %d\n", loop_num);
     char line[5000];
     char decrypted_line[5000];
     int t = recv(clientsocket,line,5000,0);
