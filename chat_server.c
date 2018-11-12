@@ -369,11 +369,29 @@ void* handleclient(void* arg) {
         // block till we get our message
         int s = 0;
         char ans[5000];
+        char decrypted_ans[5000];
+        char iv2[16];
+
         while(s < 1) {
           s = recv(clientsocket,ans,5000,0);
           printf("RECV val: %d\n", s);
         }
-        if(strncmp(ans,password,6) == 0) {
+
+        char ans_len[3];
+        memcpy(ans_len, ans, 3);
+        int ans_encrypt_len = atoi(ans_len);
+        printf("Num: %d\n", ans_len);
+        memcpy(iv2, ans+3, 16);
+        printf("iv: %s\n", iv2);
+        char no_iv2[5000];
+
+        memcpy(no_iv2,ans+19,5000);
+        printf("no iv2: %s\n", no_iv2);
+
+        int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
+        printf("decrypting worked?\n");
+
+        if(strncmp(decrypted_ans,password,6) == 0) {
           get_clients_vals->socket[index] = -1;
           printf("Closing Socket at %s\n", get_clients_vals->client_name[index]);
 
