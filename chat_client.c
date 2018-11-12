@@ -21,7 +21,7 @@ int should_exit = 0;
 unsigned char symmetric_key[32];
 unsigned char iv[16];
 // servers public key
-EVP_PKEY *public_key;
+EVP_PKEY *public_key, *private_key;
 
 void sigHandler(int signum) {
 	if (signum == SIGUSR1) {
@@ -165,8 +165,11 @@ int main(int argc, char** argv){
 
   // from cryptotest.c
 	FILE* pubkey_file = fopen("RSApub.pem","rb");
+	FILE* privkey_file = fopen("RSApriv.pem","rb");
 //	generates the public key
 	public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
+	private_key = PEM_read_PrivateKey(privkey_file,NULL,NULL,NULL);
+
 	// only want to randomly generate symmetric key once
 	RAND_bytes(symmetric_key,32);
 
