@@ -349,7 +349,7 @@ void* handleclient(void* arg) {
       //	char encrypt_len[3];
         //sprintf(encrypt_len, "%d",encryptedtxt_len);
         int val = encryptedtxt_len+19;
-        char final[35] = {0};
+        char final[96] = {0};
         unsigned char test[16];
         memcpy(test,iv2,16);
         printf("TEST: %s\n", test);
@@ -375,7 +375,7 @@ void* handleclient(void* arg) {
         printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
         // int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
-        int u = send(clientsocket, encrypt_and_iv, encryptedtxt_len+19,0);
+        int u = send(clientsocket, final, encryptedtxt_len+19,0);
       }
 
       if(strncmp(decrypted_line,"sendto",6) == 0){
