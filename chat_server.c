@@ -310,6 +310,7 @@ void* handleclient(void* arg) {
         int u = send(clientsocket, encrypted_text, length+19,0);
       }
       if(strncmp(decrypted_line,"me\n",2) == 0) {
+        printf("text is me\n");
         get_clients_vals = getClients();
         int y = 0;
         char temp[3];
@@ -328,10 +329,12 @@ void* handleclient(void* arg) {
         //printf("encrypted_text %s\n", encrypted_text);
         //printf("length %d\n", length);
 
+        printf("Temp: %s\n", temp);
+        printf("encrypting\n");
+
         RAND_bytes(iv2,16);
         printf("IV %s\n",iv2 );
 
-        printf("encrypting\n");
         //char encrypted_text[5000];
         //printf("symmetric key %s \n", symmetric_key);
         int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
