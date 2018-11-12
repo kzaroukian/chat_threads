@@ -179,7 +179,7 @@ void* receivemessage(void* arg) {
 			printf("IV %s\n",iv1 );
 
 			printf("symmetric key %s \n", symmetric_key);
-			int encryptedtxt_len = encrypt(hold, strlen(hold), symmetric_key, iv1, encrypted_text);
+			int encryptedtxt_len = encrypt(close_message, strlen(close_message), symmetric_key, iv1, encrypted_text);
 
 			char num_char[3];
 
