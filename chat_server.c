@@ -338,7 +338,7 @@ void* handleclient(void* arg) {
 
         //char encrypted_text[5000];
         //printf("symmetric key %s \n", symmetric_key);
-        int encryptedtxt_len = encrypt(temp, strnlen(temp), symmetric_key, iv2, encrypted_text);
+        int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
 
         char num_char[3];
         sprintf(num_char,"%d",encryptedtxt_len);
@@ -348,7 +348,7 @@ void* handleclient(void* arg) {
         printf("encrypted txt: %s\n", encrypted_text);
         printf("encrypt length: %d\n", encryptedtxt_len);
         unsigned char encrypt_and_iv[encryptedtxt_len+19];
-        unsigned char plz_work[ans_encrypt_len+19];
+        unsigned char plz_work[encryptedtxt_len+19];
       //	char encrypt_len[3];
         //sprintf(encrypt_len, "%d",encryptedtxt_len);
         int val = encryptedtxt_len+19;
@@ -368,7 +368,7 @@ void* handleclient(void* arg) {
         memcpy(plz_work,num_char,3);
         memcpy(plz_work+3,test,16);
         memcpy(plz_work+19,encrypted_text,encryptedtxt_len);
-        printf("PLZ WORK: %s\n", %s);
+        printf("PLZ WORK: %s\n", plz_work);
 
 
         memcpy(encrypt_and_iv, num_char, 3);
