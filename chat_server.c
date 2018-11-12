@@ -538,6 +538,9 @@ void* handleclient(void* arg) {
             printf("going\n");
           }
 
+          printf("RECEIVED MSG\n");
+          BIO_dump_fp(stdout,ans,s);
+
           printf("starting decryption \n");
           //char ans_len[3];
           printf("Size of received: %d\n", s);
