@@ -101,8 +101,11 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   int len;
   int plaintext_len;
   if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
-  if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+  if(1 != EVP_DecryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv)) {
+    printf("IF ERROR IS HERE\n");
     handleErrors();
+
+  }
   if(1 != EVP_DecryptUpdate(ctx, plaintext, &len, ciphertext, ciphertext_len))
     handleErrors();
   plaintext_len = len;
