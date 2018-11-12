@@ -1,4 +1,4 @@
-// Project 3 Chat Client by Kaylin Zaroukian
+// Project 3 Chat Client by Kaylin Zaroukian 
 
 #include <sys/socket.h>
 #include <netinet/in.h>
