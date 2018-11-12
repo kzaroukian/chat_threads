@@ -334,7 +334,7 @@ void* handleclient(void* arg) {
         printf("encrypting\n");
         //char encrypted_text[5000];
         //printf("symmetric key %s \n", symmetric_key);
-        int encryptedtxt_len = encrypt(decrypted_line, strlen(decrypted_line), symmetric_key, iv2, encrypted_text);
+        int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
 
         char num_char[3];
         sprintf(num_char,"%d",encryptedtxt_len);
