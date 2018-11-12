@@ -132,6 +132,7 @@ void* receivemessage(void* arg) {
 		printf("received message: %s\n", line);
 
 		// once we get the iv get the encrypted msg
+		printf("size: %d\n", strlen(line));
 		char decrypted_line[5000];
 		char len_res[3];
 		unsigned char iv2[16];
