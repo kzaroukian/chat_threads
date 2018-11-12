@@ -133,13 +133,16 @@ void* receivemessage(void* arg) {
 
 		// once we get the iv get the encrypted msg
 		printf("size: %d\n", k);
+
+		BIO_dump_fp(stdout, line, 36);
+
 		char decrypted_line[5000];
 		char len_res[3];
 		unsigned char iv2[16];
 
 		printf("Decrypting:\n");
-		memcpy(len_res, line, 3);
-		int encrypt_length = atoi(len_res);
+		memcpy(len_res, line, 4);
+		//int encrypt_length = atoi(len_res);
 		printf("Num: %d\n", encrypt_length);
 		//iv2[16] = '\0';
 		strncpy(iv2,line+3,16);
