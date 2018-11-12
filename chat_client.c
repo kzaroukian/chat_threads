@@ -1,4 +1,4 @@
-// Project 3 Chat Client by Kaylin Zaroukian 
+// Project 3 Chat Client by Kaylin Zaroukian
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -233,7 +233,9 @@ int main(int argc, char** argv){
 		char encrypted_text[5000];
 		printf("symmetric key %s \n", symmetric_key);
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
-
+		char num_char[3];
+		sprintf(num_char,"%d",encryptedtxt_len);
+		printf("NUM CHAR: %s\n", num_char);
 
 		printf("encrypted txt: %s\n", encrypted_text);
 		printf("encrypt length: %d\n", encryptedtxt_len);
