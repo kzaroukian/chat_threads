@@ -107,7 +107,7 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
   memcpy(encrypt_txt+3, encrypt_iv, 16);
   memcpy(encrypt_txt+19,encrypted_text,encryptedtxt_len);
   printf("encrypt_and_iv: %s\n", encrypt_txt);
-  encrypt[encryptedtxt_len+19] = '\0';
+  encrypt_txt[encryptedtxt_len+19] = '\0';
 
   printf("encrypt_and_iv size: %d\n", strlen(encrypt_txt));
 }
