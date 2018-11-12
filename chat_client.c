@@ -227,7 +227,7 @@ int main(int argc, char** argv){
 
 		// encrypt the message we're sending
 		char encrypted_text[5000];
-		int encryptedtxt_len = encrypt(line, strnlen(line), symmetric_key, iv, encrypted_text);
+		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
 
 		//int x=send(sockfd,line,strlen(line)+1,0);
 		// send the encrypted text
