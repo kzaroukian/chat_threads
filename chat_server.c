@@ -214,8 +214,10 @@ void* handleclient(void* arg) {
       printf("received message: %s\n", line);
 
       // once we get the iv get the encrypted msg
-
-      memcpy(iv, line, 16);
+      char len_res[3];
+      memcpy(len_res, line, 3);
+      int encrypt_length = atoi(len_res);
+      memcpy(iv, line+3, 16);
       printf("iv: %s\n", iv);
       char no_iv[5000];
     //  char* here = "got 'em'";
@@ -229,14 +231,14 @@ void* handleclient(void* arg) {
       //   recv(clientsocket, no_iv, 5000, 0);
       // }
       // block till we
-      memcpy(no_iv,line+16,5000);
+      memcpy(no_iv,line+19,5000);
       printf("no iv: %s\n", no_iv);
       printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
       int fin = strlen(no_iv);
       // lets decrypt the message sent
       int decrypt_len = round_by_sixteen(fin);
       printf("Decrypt length %d\n", decrypt_len);
-      int decryptedline_len = decrypt(no_iv, decrypt_len, symmetric_key, iv, decrypted_line);
+      int decryptedline_len = decrypt(no_iv, encrypt_length, symmetric_key, iv, decrypted_line);
       printf("decrypting worked?\n");
 
 

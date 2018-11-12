@@ -238,13 +238,15 @@ int main(int argc, char** argv){
 		printf("encrypted txt: %s\n", encrypted_text);
 		printf("encrypt length: %d\n", encryptedtxt_len);
 		char encrypt_and_iv[encryptedtxt_len+16];
-		memcpy(encrypt_and_iv, iv, 16);
-		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
+		char encrypt_len[3];
+		sprintf(encrypt_len, encryptedtxt_len, 3);
+		memcpy(encrypt_and_iv+3, iv, 16);
+		memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
 		encrypt_and_iv[encryptedtxt_len+16] = '\0';
 
 		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
-		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
+		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
 		//int r = send(sockfd, line, 5000, 0);
 
