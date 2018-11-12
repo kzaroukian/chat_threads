@@ -318,9 +318,10 @@ int main(int argc, char** argv){
 			return 0;
 
 		}
-		EVP_cleanup();
-	  ERR_free_strings();
+
 	}
+	EVP_cleanup();
+	ERR_free_strings();
 
 
 }

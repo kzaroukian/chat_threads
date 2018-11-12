@@ -356,7 +356,9 @@ void* handleclient(void* arg) {
         unsigned char test[16];
         memcpy(test,iv2,16);
         printf("TEST: %s\n", test);
+
         unsigned char final_encrypt[encryptedtxt_len];
+
         memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
         final_encrypt[encryptedtxt_len] = '\0';
         printf("ENCRYPTION: %s\n", final_encrypt);
@@ -702,11 +704,12 @@ int main(int argc, char** argv) {
     pthread_create(&send, NULL, handleserver, args_to_pass);
     pthread_detach(send);
 
-    EVP_cleanup();
-    ERR_free_strings();
+
 
 
 	}
+  EVP_cleanup();
+  ERR_free_strings();
 
 	return 0;
 }
