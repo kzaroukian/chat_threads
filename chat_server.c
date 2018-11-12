@@ -260,7 +260,7 @@ void* handleclient(void* arg) {
 
       int r = 0;
 
-      memcpy(no_iv,line+20,k-20);
+      memcpy(no_iv,line+20,t-20);
       //printf("no iv: %s\n", no_iv);
       //printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
