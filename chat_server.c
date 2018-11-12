@@ -52,6 +52,7 @@ void sigHandler(int signum) {
 	}
 }
 
+
 char* commands() {
   char* send = "Commands: \n get all clients - returns all clients \n sendto clientName - send to specific client\n sendto - sends to all \n *kick clientname - disconnects a client\n me - returns my username";
   return send;
@@ -134,6 +135,48 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   plaintext_len += len;
   EVP_CIPHER_CTX_free(ctx);
   return plaintext_len;
+}
+
+int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
+	unsigned char *iv, unsigned char *ciphertext){
+  EVP_CIPHER_CTX *ctx;
+  int len;
+  int ciphertext_len;
+  if(!(ctx = EVP_CIPHER_CTX_new())) handleErrors();
+  if(1 != EVP_EncryptInit_ex(ctx, EVP_aes_256_cbc(), NULL, key, iv))
+    handleErrors();
+  if(1 != EVP_EncryptUpdate(ctx, ciphertext, &len, plaintext, plaintext_len))
+    handleErrors();
+  ciphertext_len = len;
+  if(1 != EVP_EncryptFinal_ex(ctx, ciphertext + len, &len)) handleErrors();
+  ciphertext_len += len;
+  EVP_CIPHER_CTX_free(ctx);
+  return ciphertext_len;
+}
+
+void encrypt_msg(char* decrypt, char* encrypt, int encryptedtxt_len) {
+  // now we re-encrypt before sending
+  unsigned char encrypt_iv[16];
+  char encrypted_text[5000];
+  RAND_bytes(encrypt_iv,16);
+
+  encryptedtxt_len = encrypt(decrypt, strlen(decrypt), symmetric_key, encrypt_iv, encrypted_text);
+  char num_char[3];
+  sprintf(num_char,"%d",encryptedtxt_len);
+  printf("NUM CHAR: %s\n", num_char);
+
+  printf("encrypted txt: %s\n", encrypted_text);
+  printf("encrypt length: %d\n", encryptedtxt_len);
+  //char encrypt_and_iv[encryptedtxt_len+19];
+//	char encrypt_len[3];
+  //sprintf(encrypt_len, "%d",encryptedtxt_len);
+  memcpy(encrypt, num_char, 3);
+  memcpy(encrypt+3, encrypt_iv, 16);
+  memcpy(encrypt+19,encrypted_text,encryptedtxt_len);
+  printf("encrypt_and_iv: %s\n", encrypt);
+  encrypt[encryptedtxt_len+19] = '\0';
+
+  printf("encrypt_and_iv size: %d\n", strlen(encrypt));
 }
 
 void* handleclient(void* arg) {
@@ -230,7 +273,11 @@ void* handleclient(void* arg) {
       if(strncmp(decrypted_line, "commands",8) == 0){
         char* results = commands();
         memcpy(sendVal,results,5000);
-        int u = send(clientsocket, sendVal, strlen(sendVal)+1,0);
+        // now we re-encrypt before sending
+        char encrypted_text[5000];
+        int length = 0;
+        encrypt_msg(decrypted_line, encrypted_text, length);
+        int u = send(clientsocket, encrypted_text, length+19,0);
       }
       if(strncmp(decrypted_line, "get all clients\n", 15) == 0) {
         // char* results = getListOfClients();
@@ -246,7 +293,12 @@ void* handleclient(void* arg) {
           strcat(temp, " ");
           strcat(hold,temp);
         }
-        int u = send(clientsocket, hold, strlen(hold)+1,0);
+        // now we re-encrypt before sending
+        char encrypted_text[5000];
+        int length = 0;
+        encrypt_msg(hold, encrypted_text, length);
+
+        int u = send(clientsocket, encrypted_text, length+19,0);
       }
       if(strncmp(decrypted_line,"me\n",2) == 0) {
         get_clients_vals = getClients();
@@ -255,7 +307,12 @@ void* handleclient(void* arg) {
           if(get_clients_vals->socket[y] == clientsocket)  {
             char temp[3];
             memcpy(temp,get_clients_vals->client_name[y],3);
-            int u = send(clientsocket, temp, strlen(temp)+1,0);
+
+            // now we re-encrypt before sending
+            char encrypted_text[5000];
+            int length = 0;
+            encrypt_msg(temp, encrypted_text, length);
+            int u = send(clientsocket, encrypted_text, length+19,0);
           }
 
         }
@@ -279,12 +336,17 @@ void* handleclient(void* arg) {
         }
         if (send_socket > 0) {
           char* temp = "What message would you like to send?";
-          int u = send(clientsocket, temp, strlen(temp)+1,0);
+          // need to first encrypt
+          // now we re-encrypt before sending
+
+          char encrypted_text_1[5000];
+          int length1 = 0;
+          encrypt_msg(temp,encrypted_text_1, length1);
+          int u = send(clientsocket, encrypted_text_1, length1+19,0);
           // block till we get our message
           int s = 0;
           char ans[5000];
           char decrypted_ans[5000];
-          char iv2[16];
           // need to decrypt this
           while(s < 1) {
             s = recv(clientsocket,ans,5000,0);
@@ -303,12 +365,21 @@ void* handleclient(void* arg) {
           int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
           printf("decrypting worked?\n");
 
-          // now we decrypt the msg
-          send(send_socket, decrypted_ans, strlen(decrypted_ans)+1,0);
+          // now we re-encrypt before sending
+          char encrypted_text[5000];
+          int length = 0;
+          encrypt_msg(decrypted_ans, encrypted_text, length);
+          send(send_socket, encrypted_text, length+19,0);
 
         } else if(strncmp(match,"all", strlen(match)) == 0) {
           char* temp = "What message would you like to send?";
-          int u = send(clientsocket, temp, strlen(temp)+1,0);
+
+          char encrypted_text_1[5000];
+          int length1 = 0;
+          encrypt_msg(temp,encrypted_text_1,length1);
+
+          int u = send(clientsocket, encrypted_text_1, length1+19,0);
+
           int s = 0;
           char ans[5000];
           char decrypted_ans[5000];
@@ -333,11 +404,16 @@ void* handleclient(void* arg) {
           printf("decrypting worked?\n");
 
           // now we decrypt the msg
+          // now we re-encrypt before sending
+          char encrypted_text[5000];
+          int length = 0;
+          encrypt_msg(decrypted_ans, encrypted_text, length);
+
 
           int o = 0;
           for(;o<get_clients_vals->connections_num; o++) {
             if(get_clients_vals->socket[o] > 0) {
-              int p = send(get_clients_vals->socket[o],decrypted_ans, strlen(decrypted_ans)+1,0);
+              int p = send(get_clients_vals->socket[o],encrypted_text, length+19,0);
             }
           }
 
@@ -365,12 +441,17 @@ void* handleclient(void* arg) {
 
       if (send_socket > 0) {
         char* temp = "Please enter the password";
-        int u = send(clientsocket, temp, strlen(temp)+1,0);
+        // now we re-encrypt before sending
+        char encrypted_text[5000];
+        int length = 0;
+        encrypt_msg(temp, encrypted_text,length);
+
+        int u = send(clientsocket, encrypted_text, length+19,0);
         // block till we get our message
         int s = 0;
         char ans[5000];
         char decrypted_ans[5000];
-        char iv2[16];
+        unsigned char iv2[16];
 
         while(s < 1) {
           s = recv(clientsocket,ans,5000,0);
@@ -399,8 +480,14 @@ void* handleclient(void* arg) {
           memcpy(get_clients_vals->client_name[index],"",5);
           char* exit = "escape_msg";
 
+          // next we encrypt again
+          char encrypted_text1[5000];
+          int length1 = 0;
+          encrypt_msg(exit, encrypted_text1,length1);
+
+
           // send message to client to let them know we're closing them
-          int f = send(send_socket,exit,strlen(exit)+1,0);
+          int f = send(send_socket,encrypted_text1,length1+19,0);
           //close(send_socket);
 
           //break;
