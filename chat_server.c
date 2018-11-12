@@ -489,6 +489,7 @@ void* handleclient(void* arg) {
           // encrypt_msg(temp,encrypted_text_1, length1);
           // int u = send(clientsocket, encrypted_text_1, length1+19,0);
 
+          printf("msg : %s\n", temp);
           printf("Starting Encryption: \n");
 
           char encrypted_text[5000];
@@ -569,6 +570,7 @@ void* handleclient(void* arg) {
 
           RAND_bytes(iv_msg,16);
           //printf("IV %s\n",iv_msg);
+          printf("decrypted ans size %d vs socket size %d\n",strlen(decrypted_ans),s );
 
           //printf("symmetric key %s \n", symmetric_key);
           int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), symmetric_key, iv_msg, encrypted_msg);
