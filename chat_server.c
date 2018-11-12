@@ -1,4 +1,4 @@
-// Project 3 Chat Server by Kaylin Zaroukian 
+// Project 3 Chat Server by Kaylin Zaroukian
 
 // NEED TO COMPILE LIKE: gcc threadtcpechoserver.c -lpthread -o s
 
@@ -179,36 +179,16 @@ void* handleclient(void* arg) {
     // but just in case we'll block
     if(strncmp(line,"~key",4) == 0) {
       printf("key\n");
-      // the key should be sent next
-      // block till we get our key
-      // each thread needs a different key
-      //int r = -1;
+
       char encrypted_key[5000];
       memcpy(encrypted_key,line+4,sizeof(line)-4);
-      //printf("length: %d, encrypted key: %s\n", strlen(encrypted_key),encrypted_key);
-      // while (r < 0) {
-      //   r = recv(clientsocket,encrypted_key,32,0);
-      //   printf("encrypted key\n");
-      // }
-      // int r = recv(clientsocket,encrypted_key,32,0);
-      // printf("we should have the encrypted key now r val: %d\n", r);
-
       // we should have now received the encrypted key
       int decryptedkey_len = rsa_decrypt(encrypted_key, 256, private_key,symmetric_key);
-    //printf("Key: %s", symmetric_key);
 
       // now we have the decrypted symmetric key!
       memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
       continue;
     } else if (loop_num >1){
-      // we already have the decrypted key
-      // int m = -1;
-      //
-      // // now we should receive the iv
-      // while(m < 0) {
-      //   m = recv(clientsocket,iv,16,0);
-      // }
-
 
       // get the iv
       printf("received message: %s\n", line);
@@ -221,25 +201,13 @@ void* handleclient(void* arg) {
       memcpy(iv, line+3, 16);
       printf("iv: %s\n", iv);
       char no_iv[5000];
-    //  char* here = "got 'em'";
-      // got the iv - now tell the server we got it
-      //send(clientsocket,here,strlen(here),0);
 
-      // block till we get the encrypted msg
       int r = 0;
-      // while(r < 1){
-      //   // our encrypted msg
-      //   recv(clientsocket, no_iv, 5000, 0);
-      // }
-      // block till we
+
       memcpy(no_iv,line+19,5000);
       printf("no iv: %s\n", no_iv);
       printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
-      //int fin = strlen(no_iv);
-      // lets decrypt the message sent
-      //int decrypt_len = round_by_sixteen(fin);
-      //printf("Data: %d\n", encrypt_length);
-    //  printf("Decrypt length %d\n", decrypt_len);
+
       int decryptedline_len = decrypt(no_iv, encrypt_length, symmetric_key, iv, decrypted_line);
       printf("decrypting worked?\n");
 
@@ -290,7 +258,6 @@ void* handleclient(void* arg) {
             int u = send(clientsocket, temp, strlen(temp)+1,0);
           }
 
-
         }
       }
 
@@ -322,15 +289,23 @@ void* handleclient(void* arg) {
           while(s < 1) {
             s = recv(clientsocket,ans,5000,0);
           }
-          int b = -1;
-          while (b < 1) {
-            b = recv(clientsocket,iv2,32,0);
-          }
+          char ans_len[3];
+          memcpy(ans_len, ans, 3);
+          int ans_encrypt_len = atoi(ans_len);
+          printf("Num: %d\n", ans_len);
+          memcpy(iv2, ans+3, 16);
+          printf("iv: %s\n", iv2);
+          char no_iv2[5000];
+
+          memcpy(no_iv2,ans+19,5000);
+          printf("no iv2: %s\n", no_iv2);
+
+          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
+          printf("decrypting worked?\n");
 
           // now we decrypt the msg
-          int decryptedans_len = decrypt(ans, sizeof(ans), symmetric_key, iv2, decrypted_ans);
-
           send(send_socket, decrypted_ans, strlen(decrypted_ans)+1,0);
+
         } else if(strncmp(match,"all", strlen(match)) == 0) {
           char* temp = "What message would you like to send?";
           int u = send(clientsocket, temp, strlen(temp)+1,0);
@@ -342,12 +317,22 @@ void* handleclient(void* arg) {
           while(s < 1) {
             s = recv(clientsocket,ans,5000,0);
           }
-          int b = -1;
-          while (b < 1) {
-            b = recv(clientsocket,iv2,32,0);
-          }
+
+          char ans_len[3];
+          memcpy(ans_len, ans, 3);
+          int ans_encrypt_len = atoi(ans_len);
+          printf("Num: %d\n", ans_len);
+          memcpy(iv2, ans+3, 16);
+          printf("iv: %s\n", iv2);
+          char no_iv2[5000];
+
+          memcpy(no_iv2,ans+19,5000);
+          printf("no iv2: %s\n", no_iv2);
+
+          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
+          printf("decrypting worked?\n");
+
           // now we decrypt the msg
-          int decryptedans_len = decrypt(ans, sizeof(ans), symmetric_key, iv2, decrypted_ans);
 
           int o = 0;
           for(;o<get_clients_vals->connections_num; o++) {

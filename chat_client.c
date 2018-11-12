@@ -251,25 +251,6 @@ int main(int argc, char** argv){
 		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
-		//int r = send(sockfd, line, 5000, 0);
-
-		// encrypt the message we're sending
-
-		//int v = send(sockfd,iv,16,0);
-		//int e = 0;
-		// char res[5000];
-		// // now block till we know server got the iv
-		// while(e < 1) {
-		// 	e = recv(sockfd,res,sizeof(res),0);
-		// }
-
-		// send the encrypted message & then send the iv
-		// int u = -1;
-		// // block till the iv is sent
-		// while (u<0){
-		// 	u = send(sockfd,iv,strlen(iv)+1,0);
-		// }
-
 		if(strncmp(line, "Quit\n", 4) == 0) {
 			close(sockfd);
 			return 0;
