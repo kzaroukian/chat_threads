@@ -500,7 +500,7 @@ void* handleclient(void* arg) {
           memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
 
           printf("IV\n" );
-          BIO_dump_fp(stdout, iv2, 16);
+          BIO_dump_fp(stdout, iv1, 16);
 
 
           printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
@@ -793,7 +793,7 @@ void* handleclient(void* arg) {
 
 
           // send message to client to let them know we're closing them
-          int f = send(send_socket,encryptedmsg_and_iv,encryptedmsg_len+20,0);
+          int f = send(send_socket,encryptmsg_and_iv,encryptedmsg_len+20,0);
           //close(send_socket);
 
           //break;
