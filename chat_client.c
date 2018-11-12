@@ -141,7 +141,7 @@ void* receivemessage(void* arg) {
 		memcpy(len_res, line, 3);
 		int encrypt_length = atoi(len_res);
 		printf("Num: %d\n", encrypt_length);
-		iv2[16] = '\0';
+		//iv2[16] = '\0';
 		strncpy(iv2,line+3,16);
 		//memcpy(iv2, line+3, 16);
 		printf("iv: %s\n", iv2);
