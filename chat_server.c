@@ -169,7 +169,6 @@ void* handleclient(void* arg) {
 
       // we should have now received the encrypted key
       int decryptedkey_len = rsa_decrypt(encrypted_key, 256, private_key,symmetric_key);
-      printf("RSA decrypt isn;t the prob\n");
       printf("Key: %s", symmetric_key);
 
       // now we have the decrypted symmetric key!
@@ -186,6 +185,7 @@ void* handleclient(void* arg) {
 
       // get the iv
       memcpy(iv, line, 16);
+      printf("iv: %s\n", iv);
       char no_iv[5000];
       memcpy(no_iv,line+16,5000);
 
