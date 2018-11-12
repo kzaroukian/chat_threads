@@ -390,7 +390,7 @@ void* handleclient(void* arg) {
 
         // int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
-        int u = send(clientsocket, final, encryptedtxt_len+19+1,0);
+        int u = send(clientsocket, encrypt_and_iv, encryptedtxt_len+19+1,0);
       }
 
       if(strncmp(decrypted_line,"sendto",6) == 0){
