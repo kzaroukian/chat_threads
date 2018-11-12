@@ -185,8 +185,8 @@ int main(int argc, char** argv){
 	printf("Key: %s", symmetric_key);
 
 	char complete_key_msg[encryptedkey_len+4];
-	printf("sending key msg size: %d\n", encryptedkey_len);
-	printf("encrypted_key: %s\n", encrypted_key);
+	//printf("sending key msg size: %d\n", encryptedkey_len);
+	//printf("encrypted_key: %s\n", encrypted_key);
 	memcpy(complete_key_msg,key_msg,4);
 	memcpy(complete_key_msg + 4,encrypted_key,encryptedkey_len);
 	int r = send(sockfd,complete_key_msg,encryptedkey_len+4,0);
