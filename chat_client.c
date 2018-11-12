@@ -182,6 +182,7 @@ int main(int argc, char** argv){
 	// should we send a warning message first?
 
 	char* key_msg = "~key";
+	printf("Key: %s", symmetric_key);
 
 	char complete_key_msg[encryptedkey_len+4];
 	printf("sending key msg size: %d\n", encryptedkey_len);
