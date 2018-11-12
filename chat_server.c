@@ -470,12 +470,14 @@ void* handleclient(void* arg) {
         printf("TO: %s\n",match);
         printf("Size: %lu\n", strlen(match));
         int y = 0;
+        int send_spot = 0;
         for(;y<get_clients_vals->connections_num;y++) {
           printf("Compare Val %d\n", strncmp(match,"all", strlen(match)));
 
           if (strncmp(match,get_clients_vals->client_name[y], strlen(match)) == 10) {
             //printf("ISSA MATCH\n");
             send_socket = get_clients_vals->socket[y];
+            send_spot = y;
           }
 
         }
@@ -577,7 +579,7 @@ void* handleclient(void* arg) {
           printf("decrypted ans size %d vs socket size %d\n",strlen(decrypted_ans),s );
 
           //printf("symmetric key %s \n", symmetric_key);
-          int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), symmetric_key, iv_msg, encrypted_msg);
+          int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), get_clients_vals->symmetric_keys[send_spot], iv_msg, encrypted_msg);
 
           //printf("encrypted txt: %s\n", encrypted_msg);
         //  printf("encrypt length: %d\n", encryptedmsg_len);
