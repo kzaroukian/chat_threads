@@ -383,7 +383,7 @@ void* handleclient(void* arg) {
         printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
         // int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
-        int u = send(clientsocket, final, encryptedtxt_len+19,0);
+        int u = send(clientsocket, final, encryptedtxt_len+19+1,0);
       }
 
       if(strncmp(decrypted_line,"sendto",6) == 0){
