@@ -349,7 +349,7 @@ void* handleclient(void* arg) {
       //	char encrypt_len[3];
         //sprintf(encrypt_len, "%d",encryptedtxt_len);
         int val = encryptedtxt_len+19;
-        char final[96] = {0};
+        char final[35] = {0};
         unsigned char test[16];
         memcpy(test,iv2,16);
         printf("TEST: %s\n", test);
