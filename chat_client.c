@@ -189,7 +189,7 @@ int main(int argc, char** argv){
 	//printf("encrypted_key: %s\n", encrypted_key);
 	memcpy(complete_key_msg,key_msg,4);
 	memcpy(complete_key_msg + 4,encrypted_key,encryptedkey_len);
-	int r = send(sockfd,iv,16,0);
+	int r = send(sockfd,complete_key_msg,encryptedkey_len+4,0);
 	// int c= -1;
 
 	// // blocks till the key is sent
@@ -245,7 +245,7 @@ int main(int argc, char** argv){
 		memcpy(encrypt_and_iv, iv, 16);
 		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
+		int x=send(sockfd,encrypted_text,encryptedtxt_len,0);
 		// send the encrypted message & then send the iv
 		// int u = -1;
 		// // block till the iv is sent
