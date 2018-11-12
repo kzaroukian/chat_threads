@@ -157,8 +157,9 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
   // now we re-encrypt before sending
   unsigned char encrypt_iv[16];
-  char encrypted_text[5000];
   RAND_bytes(encrypt_iv,16);
+
+  char encrypted_text[5000];
 
   encryptedtxt_len = encrypt(decrypt_txt, strlen(decrypt_txt), symmetric_key, encrypt_iv, encrypted_text);
   char num_char[3];
