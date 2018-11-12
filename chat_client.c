@@ -161,7 +161,7 @@ void* receivemessage(void* arg) {
 		printf("no iv: %s\n", no_iv);
 		printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
-		int decryptedline_len = decrypt(no_iv, encrypt_length, symmetric_key, iv2, decrypted_line);
+		int decryptedline_len = decrypt(no_iv, t, symmetric_key, iv2, decrypted_line);
 		printf("decrypting worked?\n");
 
 		if (strncmp(decrypted_line,"escape_msg",10) == 0) {
