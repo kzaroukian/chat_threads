@@ -121,6 +121,7 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
 void* receivemessage(void* arg) {
 	int serversocket = *(int*)arg;
 	while(1) {
+		printf("receiving message\n");
 		// receive message
 		char line[5000];
 		int k = recv(serversocket,line,5000,0);
@@ -130,10 +131,10 @@ void* receivemessage(void* arg) {
 		//int decryptedtext_len = decrypt(line2, strlen(line2+1), )
 
 		// get the iv
-		printf("received message: %s\n", line);
+	//	printf("received message: %s\n", line);
 
 		// once we get the iv get the encrypted msg
-		printf("size: %d\n", k);
+		printf("size of received msg: %d\n", k);
 
 		printf("BIO DUMP:\n");
 		BIO_dump_fp(stdout, line, k);
@@ -143,28 +144,29 @@ void* receivemessage(void* arg) {
 		unsigned char iv2[16];
 		int t = 0;
 		memcpy(&t,line,4);
-		printf("T val: %d\n", t);
+		printf("encrypt length: %d\n", t);
 
 		printf("Decrypting:\n");
-		memcpy(len_res, line, 4);
-		int encrypt_length = atoi(len_res);
-		printf("Num: %d\n", encrypt_length);
+		// memcpy(len_res, line, 4);
+		// int encrypt_length = atoi(len_res);
+		//rintf("Num: %d\n", encrypt_length);
 		//iv2[16] = '\0';
 		strncpy(iv2,line+4,16);
 		//memcpy(iv2, line+3, 16);
-		printf("iv: %s\n", iv2);
-		printf("SIZE: %d\n", strlen(iv2));
+	//	printf("iv: %s\n", iv2);
+	//	printf("SIZE: %d\n", strlen(iv2));
 		char no_iv[5000];
 
 		int r = 0;
 
 		memcpy(no_iv,line+20,k);
-		printf("no iv: %s\n", no_iv);
-		printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
+		//printf("no iv: %s\n", no_iv);
+		//printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
 		int decryptedline_len = decrypt(no_iv, t, symmetric_key, iv2, decrypted_line);
 		printf("decrypting worked?\n");
-		printf("RECEIVED: %s", decrypted_line);
+		printf("\n" );
+		printf("RECEIVED: %s\n", decrypted_line);
 
 		if (strncmp(decrypted_line,"escape_msg",10) == 0) {
 			printf("its a trap\n");
