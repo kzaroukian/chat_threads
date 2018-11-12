@@ -184,6 +184,7 @@ void* handleclient(void* arg) {
 
 
       // get the iv
+      printf("received message: %s\n", line);
       memcpy(iv, line, 16);
       printf("iv: %s\n", iv);
       char no_iv[5000];
