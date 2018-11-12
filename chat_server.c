@@ -130,7 +130,7 @@ void* handleclient(void* arg) {
   printf("Socket: %d\n", clientsocket);
 
   // as soon as client connects send the public RSA key
-  send(clientsocket, public_key, sizeof(public_key),0);
+  //send(clientsocket, public_key, sizeof(public_key),0);
 
   while (1) {
     char line[5000];
@@ -397,7 +397,7 @@ int main(int argc, char** argv) {
   FILE* pubkey_file = fopen("RSApub.pem","rb");
   FILE* privkey_file = fopen("RSApriv.pem","rb");
   // generates the public key
-  public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
+  //public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
   private_key = PEM_read_PrivateKey(privkey_file,NULL,NULL,NULL);
 
 	int sockfd = socket(AF_INET, SOCK_STREAM, 0);
