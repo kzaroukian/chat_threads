@@ -167,6 +167,8 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
 
   printf("encrypted txt: %s\n", encrypted_text);
   printf("encrypt length: %d\n", encryptedtxt_len);
+
+  printf("ENCRYPT_IV: %s\n", encrypt_iv);
   //char encrypt_and_iv[encryptedtxt_len+19];
 //	char encrypt_len[3];
   //sprintf(encrypt_len, "%d",encryptedtxt_len);
