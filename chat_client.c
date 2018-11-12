@@ -143,6 +143,7 @@ void* receivemessage(void* arg) {
 		printf("Num: %d\n", encrypt_length);
 		memcpy(iv2, line+3, 16);
 		printf("iv: %s\n", iv2);
+		printf("SIZE: %d\n", strlen(iv2));
 		char no_iv[5000];
 
 		int r = 0;
