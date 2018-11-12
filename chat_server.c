@@ -524,6 +524,7 @@ void* handleclient(void* arg) {
           while(s < 1) {
             s = recv(clientsocket,ans,5000,0);
           }
+
           printf("starting decryption \n");
           char ans_len[3];
           unsigned char iv2[16];
@@ -539,6 +540,8 @@ void* handleclient(void* arg) {
 
           int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, symmetric_key, iv2, decrypted_ans);
           printf("decrypting worked?\n");
+          printf("received from client: %s\n", decrypted_ans);
+
 
           // now we re-encrypt before sending
           // char encrypted_text[5000];
