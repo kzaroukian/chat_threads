@@ -517,13 +517,17 @@ void* handleclient(void* arg) {
 
           int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
 
+          printf("sent msg request\n");
+
           // block till we get our message
           int s = 0;
           char ans[5000];
           char decrypted_ans[5000];
+          printf("keep going\n");
           // need to decrypt this
           while(s < 1) {
             s = recv(clientsocket,ans,5000,0);
+            printf("going\n");
           }
 
           printf("starting decryption \n");
