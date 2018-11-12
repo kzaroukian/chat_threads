@@ -236,6 +236,7 @@ void* handleclient(void* arg) {
       memcpy(encrypted_key,line+4,sizeof(line)-4);
       // we should have now received the encrypted key
       int decryptedkey_len = rsa_decrypt(encrypted_key, 256, private_key,symmetric_key);
+      printf("SYM KEY: %s\n", symmetric_key);
 
       // now we have the decrypted symmetric key!
       memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
