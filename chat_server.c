@@ -177,11 +177,12 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
   char encrypt_and_iv[encryptedtxt_len+19];
 //	char encrypt_len[3];
   //sprintf(encrypt_len, "%d",encryptedtxt_len);
-  memcpy(encrypt_and_iv, num_char, 3);
-  memcpy(encrypt_and_iv+3, encrypt_iv, 16);
-  memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
+  memcpy(encrypt_and_iv, encryptedtxt_len, 4);
+  memcpy(encrypt_and_iv+4, encrypt_iv, 16);
+  memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
   printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-  encrypt_and_iv[encryptedtxt_len+19] = '\0';
+  //encrypt_and_iv[encryptedtxt_len+19] = '\0
+  BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
 
   memcpy(encrypt_txt,encrypt_and_iv,encryptedtxt_len+19);
 
@@ -341,9 +342,9 @@ void* handleclient(void* arg) {
         int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
 
         char num_char[3];
-        sprintf(num_char,"%d",encryptedtxt_len);
-        printf("NUM CHAR: %s\n", num_char);
-        printf("KEY: %s\n", symmetric_key);
+        // sprintf(num_char,"%d",encryptedtxt_len);
+        // printf("NUM CHAR: %s\n", num_char);
+        // printf("KEY: %s\n", symmetric_key);
 
         printf("encrypted txt: %s\n", encrypted_text);
         printf("encrypt length: %d\n", encryptedtxt_len);
@@ -355,31 +356,31 @@ void* handleclient(void* arg) {
         char final[35] = {0};
         unsigned char test[16];
         memcpy(test,iv2,16);
-        printf("TEST: %s\n", test);
-        printf("IV length %d\n", strlen(test));
+        // printf("TEST: %s\n", test);
+        // printf("IV length %d\n", strlen(test));
 
         unsigned char final_encrypt[encryptedtxt_len];
 
         memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
         final_encrypt[encryptedtxt_len] = '\0';
-        printf("ENCRYPTION: %s\n", final_encrypt);
-        strcat(final,num_char);
-        strcat(final,test);
-        strcat(final,final_encrypt);
-        printf("FINAL: %s\n", final);
+        //printf("ENCRYPTION: %s\n", final_encrypt);
+        // strcat(final,num_char);
+        // strcat(final,test);
+        // strcat(final,final_encrypt);
+        // printf("FINAL: %s\n", final);
 
-        memcpy(plz_work,num_char,3);
-        memcpy(plz_work+3,test,16);
-        memcpy(plz_work+19,encrypted_text,encryptedtxt_len);
-        printf("PLZ WORK: %s\n", plz_work);
-
-
-        strncpy(encrypt_and_iv, num_char, 3);
-        strncpy(encrypt_and_iv+3, test, 16);
-        strncpy(encrypt_and_iv+19, encrypted_text, encryptedtxt_len);
-        printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-        printf("sizeof %d\n", sizeof(encrypt_and_iv));
-        // encrypt_and_iv[encryptedtxt_len+19] = '\0';
+        // memcpy(plz_work,num_char,3);
+        // memcpy(plz_work+3,test,16);
+        // memcpy(plz_work+19,encrypted_text,encryptedtxt_len);
+        // printf("PLZ WORK: %s\n", plz_work);
+        //
+        //
+        memcpy(encrypt_and_iv, num_char, 3);
+        memcpy(encrypt_and_iv+3, test, 16);
+        memcpy(encrypt_and_iv+19, encrypted_text, encryptedtxt_len);
+        // printf("encrypt_and_iv: %s\n", encrypt_and_iv);
+        // printf("sizeof %d\n", sizeof(encrypt_and_iv));
+        // // encrypt_and_iv[encryptedtxt_len+19] = '\0';
         encrypt_and_iv[encryptedtxt_len+19] = '\0';
 
 
