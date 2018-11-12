@@ -204,14 +204,6 @@ int main(int argc, char** argv){
 
 	while(1) {
 
-
-
-		pthread_t receive;
-
-		pthread_create(&receive, NULL, receivemessage, &sockfd);
-
-		pthread_detach(receive);
-
 		if(should_exit == 1){
 			close(sockfd);
 			return 0;
@@ -236,6 +228,12 @@ int main(int argc, char** argv){
 		}
 		char encrypted_text[5000];
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
+
+		pthread_t receive;
+
+		pthread_create(&receive, NULL, receivemessage, &sockfd);
+
+		pthread_detach(receive);
 
 		//int x=send(sockfd,line,strlen(line)+1,0);
 		// send the encrypted text
