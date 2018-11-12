@@ -803,7 +803,7 @@ void* handleclient(void* arg) {
           //printf("IV %s\n",iv_msg);
 
           //printf("symmetric key %s \n", symmetric_key);
-          int encryptedmsg_len = encrypt(exit, strlen(exit), get_clients_vals->symmetric_keys[s_index], iv_msg, encrypted_msg);
+          int encryptedmsg_len = encrypt(exit, strlen(exit), get_clients_vals->symmetric_keys[index], iv_msg, encrypted_msg);
 
           //printf("encrypted txt: %s\n", encrypted_msg);
           //printf("encrypt length: %d\n", encryptedmsg_len);
