@@ -163,6 +163,7 @@ void* receivemessage(void* arg) {
 
 		int decryptedline_len = decrypt(no_iv, t, symmetric_key, iv2, decrypted_line);
 		printf("decrypting worked?\n");
+		printf("RECEIVED: %s", decrypted_line);
 
 		if (strncmp(decrypted_line,"escape_msg",10) == 0) {
 			printf("its a trap\n");
