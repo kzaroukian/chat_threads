@@ -516,12 +516,15 @@ void* handleclient(void* arg) {
 
           //printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
 
-          printf("BIO DUMP\n");
+          printf("Encrypted MSG:\n");
           BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
 
+          printf("sending now\n");
+          // this is the problem
           int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
+          // why
 
-          printf("sent msg request\n");
+          printf("sent msg request val is %d\n",u);
 
           // block till we get our message
           int s = 0;
