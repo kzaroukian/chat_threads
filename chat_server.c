@@ -245,7 +245,11 @@ void* handleclient(void* arg) {
     //  printf("received message: %s\n", line);
 
       // once we get the iv get the encrypted msg
-      char len_res[3];
+      //char len_res[3];
+
+      printf("received msg: \n");
+      BIO_dump_fp(stdout, line, t);
+
       int encrypt_length = 0;
       memcpy(&encrypt_length, line, 4);
 
@@ -256,7 +260,7 @@ void* handleclient(void* arg) {
 
       int r = 0;
 
-      memcpy(no_iv,line+20,5000);
+      memcpy(no_iv,line+20,k-20);
       //printf("no iv: %s\n", no_iv);
       //printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
