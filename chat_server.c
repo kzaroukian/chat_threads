@@ -590,8 +590,8 @@ void* handleclient(void* arg) {
           printf("encrypted msg\n");
           BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
 
-          send(send_socket, encryptmsg_and_iv, encryptedmsg_len+20,0);
-          printf("waiting\n");
+          int j = send(send_socket, encryptmsg_and_iv, encryptedmsg_len+20,0);
+          printf("waiting %d\n", j);
 
         } else if(strncmp(match,"all", strlen(match)) == 0) {
           char* temp = "What message would you like to send?";
