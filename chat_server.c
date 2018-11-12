@@ -338,7 +338,6 @@ void* handleclient(void* arg) {
         RAND_bytes(iv2,16);
         printf("IV %s\n",iv2 );
 
-        char encrypted_text[5000];
         printf("symmetric key %s \n", symmetric_key);
         int encryptedtxt_len = encrypt(temp, strlen(temp), symmetric_key, iv2, encrypted_text);
 
@@ -370,8 +369,6 @@ void* handleclient(void* arg) {
 
         printf("BIO DUMP\n");
         BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
-
-        int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
 
         int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
       }
