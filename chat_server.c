@@ -154,13 +154,13 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
   return ciphertext_len;
 }
 
-void encrypt_msg(char* decrypt, char* encrypt, int encryptedtxt_len) {
+void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
   // now we re-encrypt before sending
   unsigned char encrypt_iv[16];
   char encrypted_text[5000];
   RAND_bytes(encrypt_iv,16);
 
-  encryptedtxt_len = encrypt(decrypt, strlen(decrypt), symmetric_key, encrypt_iv, encrypted_text);
+  encryptedtxt_len = encrypt(decrypt_txt, strlen(decrypt_txt), symmetric_key, encrypt_iv, encrypted_text);
   char num_char[3];
   sprintf(num_char,"%d",encryptedtxt_len);
   printf("NUM CHAR: %s\n", num_char);
@@ -170,13 +170,13 @@ void encrypt_msg(char* decrypt, char* encrypt, int encryptedtxt_len) {
   //char encrypt_and_iv[encryptedtxt_len+19];
 //	char encrypt_len[3];
   //sprintf(encrypt_len, "%d",encryptedtxt_len);
-  memcpy(encrypt, num_char, 3);
-  memcpy(encrypt+3, encrypt_iv, 16);
-  memcpy(encrypt+19,encrypted_text,encryptedtxt_len);
-  printf("encrypt_and_iv: %s\n", encrypt);
+  memcpy(encrypt_txt, num_char, 3);
+  memcpy(encrypt_txt+3, encrypt_iv, 16);
+  memcpy(encrypt_txt+19,encrypted_text,encryptedtxt_len);
+  printf("encrypt_and_iv: %s\n", encrypt_txt);
   encrypt[encryptedtxt_len+19] = '\0';
 
-  printf("encrypt_and_iv size: %d\n", strlen(encrypt));
+  printf("encrypt_and_iv size: %d\n", strlen(encrypt_txt));
 }
 
 void* handleclient(void* arg) {
@@ -352,6 +352,7 @@ void* handleclient(void* arg) {
             s = recv(clientsocket,ans,5000,0);
           }
           char ans_len[3];
+          unsigned char[16] iv2;
           memcpy(ans_len, ans, 3);
           int ans_encrypt_len = atoi(ans_len);
           printf("Num: %d\n", ans_len);
