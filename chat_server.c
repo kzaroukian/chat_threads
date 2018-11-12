@@ -177,7 +177,7 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
   char encrypt_and_iv[encryptedtxt_len+19];
 //	char encrypt_len[3];
   //sprintf(encrypt_len, "%d",encryptedtxt_len);
-  memcpy(encrypt_and_iv, encryptedtxt_len, 4);
+  memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
   memcpy(encrypt_and_iv+4, encrypt_iv, 16);
   memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
   printf("encrypt_and_iv: %s\n", encrypt_and_iv);
