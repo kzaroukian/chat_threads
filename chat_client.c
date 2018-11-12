@@ -189,7 +189,7 @@ int main(int argc, char** argv){
 	//printf("encrypted_key: %s\n", encrypted_key);
 	memcpy(complete_key_msg,key_msg,4);
 	memcpy(complete_key_msg + 4,encrypted_key,encryptedkey_len);
-	int r = send(sockfd,complete_key_msg,encryptedkey_len+4,0);
+	int r = send(sockfd,iv,16,0);
 	// int c= -1;
 
 	// // blocks till the key is sent
