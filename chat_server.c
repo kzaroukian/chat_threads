@@ -155,12 +155,13 @@ void* handleclient(void* arg) {
       // each thread needs a different key
       //int r = -1;
       char encrypted_key[32];
+      memcpy(encrypted_key,line+4,32);
       // while (r < 0) {
       //   r = recv(clientsocket,encrypted_key,32,0);
       //   printf("encrypted key\n");
       // }
-      int r = recv(clientsocket,encrypted_key,32,0);
-      printf("we should have the encrypted key now r val: %d\n", r);
+      // int r = recv(clientsocket,encrypted_key,32,0);
+      // printf("we should have the encrypted key now r val: %d\n", r);
 
       // we should have now received the encrypted key
       int decryptedkey_len = rsa_decrypt(encrypted_key, sizeof(encrypted_key), private_key,symmetric_key);
@@ -169,15 +170,21 @@ void* handleclient(void* arg) {
       memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
     } else {
       // we already have the decrypted key
-      int m = -1;
+      // int m = -1;
+      //
+      // // now we should receive the iv
+      // while(m < 0) {
+      //   m = recv(clientsocket,iv,16,0);
+      // }
 
-      // now we should receive the iv
-      while(m < 0) {
-        m = recv(clientsocket,iv,16,0);
-      }
+
+      // get the iv
+      memcpy(iv, line, 16);
+      char no_iv[5000];
+      memcpy(no_iv,line+16,5000);
 
       // lets decrypt the message sent
-      int decryptedline_len = decrypt(line, sizeof(line), symmetric_key, iv, decrypted_line);
+      int decryptedline_len = decrypt(no_iv, sizeof(no_iv), symmetric_key, iv, decrypted_line);
 
 
       // means we need to destroy this thread
