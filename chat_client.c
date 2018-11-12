@@ -165,7 +165,7 @@ int main(int argc, char** argv){
 
   // from cryptotest.c
 	FILE* pubkey_file = fopen("RSApub.pem","rb");
-	generates the public key
+//	generates the public key
 	public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
 	// only want to randomly generate symmetric key once
 	RAND_bytes(symmetric_key,32);
