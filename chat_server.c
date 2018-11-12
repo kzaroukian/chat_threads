@@ -256,7 +256,7 @@ void* handleclient(void* arg) {
       //printf("Num: %d\n", encrypt_length);
       memcpy(iv, line+4, 16);
       //printf("iv: %s\n", iv);
-      char no_iv[5000];
+      char no_iv[t-20];
 
       int r = 0;
 
