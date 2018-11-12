@@ -226,6 +226,14 @@ int main(int argc, char** argv){
 		fgets(line,5000,stdin);
 
 		// encrypt the message we're sending
+
+		int v = send(sockfd,iv,16,0);
+		int e = 0;
+		char res[5000];
+		// now block till we know server got the iv
+		while(e < 1) {
+			e = recv(sockfd,res,sizeof(res),0);
+		}
 		char encrypted_text[5000];
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
 
