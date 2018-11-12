@@ -527,7 +527,8 @@ void* handleclient(void* arg) {
           }
 
           printf("starting decryption \n");
-          char ans_len[3];
+          //char ans_len[3];
+          printf("Size of received: %d\n", s);
           unsigned char iv2[16];
 
           int ans_encrypt_len = 0;

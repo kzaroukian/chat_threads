@@ -345,23 +345,27 @@ int main(int argc, char** argv){
 		char encrypted_text[5000];
 		printf("symmetric key %s \n", symmetric_key);
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
-		char num_char[3];
-		sprintf(num_char,"%d",encryptedtxt_len);
-		printf("NUM CHAR: %s\n", num_char);
+		// char num_char[3];
+		// sprintf(num_char,"%d",encryptedtxt_len);
+		// printf("NUM CHAR: %s\n", num_char);
 
-		printf("encrypted txt: %s\n", encrypted_text);
-		printf("encrypt length: %d\n", encryptedtxt_len);
-		char encrypt_and_iv[encryptedtxt_len+19];
+		// printf("encrypted txt: %s\n", encrypted_text);
+		// printf("encrypt length: %d\n", encryptedtxt_len);
+		char encrypt_and_iv[encryptedtxt_len+20];
 	//	char encrypt_len[3];
 		//sprintf(encrypt_len, "%d",encryptedtxt_len);
 		memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
 		memcpy(encrypt_and_iv+4, iv, 16);
 		memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-		encrypt_and_iv[encryptedtxt_len+20] = '\0';
+		//encrypt_and_iv[encryptedtxt_len+20] = '\0';
+
+		printf("BIO DUMP:\n");
+		BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
 
 		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+20,0);
+		printf("Size sent: %d\n", x);
 
 		if(strncmp(line, "Quit\n", 4) == 0) {
 			close(sockfd);
