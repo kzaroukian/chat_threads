@@ -154,7 +154,7 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
   return ciphertext_len;
 }
 
-void encrypt_msg(char* decrypt_txt, char* encrypt_and_iv, int encryptedtxt_len) {
+int encrypt_msg(char* decrypt_txt, char* encrypt_and_iv, int encryptedtxt_len) {
   printf("encrypting\n");
 
   unsigned char iv2[16];
@@ -182,6 +182,8 @@ void encrypt_msg(char* decrypt_txt, char* encrypt_and_iv, int encryptedtxt_len) 
 
   printf("BIO DUMP\n");
   BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+
+  return 1;
 }
 
 void* handleclient(void* arg) {
@@ -322,7 +324,11 @@ void* handleclient(void* arg) {
         char encrypted_text[5000];
         unsigned char iv2[16];
         int length = 0;
-        encrypt_msg(temp, encrypted_text, length);
+        int r = 0;
+        while (r < 1) {
+          r = encrypt_msg(temp, encrypted_text, length);
+
+        }
         printf("encrypted_text %s\n", encrypted_text);
         printf("length %d\n", length);
 
