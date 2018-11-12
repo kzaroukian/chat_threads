@@ -232,9 +232,9 @@ int main(int argc, char** argv){
 		//int x=send(sockfd,line,strlen(line)+1,0);
 		// send the encrypted text
 		printf("encrypt length: %d\n", encryptedtxt_len);
-		char encrypt_and_iv[5016];
+		char encrypt_and_iv[encryptedtxt_len+16];
 		memcpy(encrypt_and_iv, iv, 16);
-		memcpy(encrypt_and_iv+16,encrypted_text,5000);
+		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
 		// send the encrypted message & then send the iv
