@@ -176,7 +176,7 @@ void* handleclient(void* arg) {
       // now we have the decrypted symmetric key!
       memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
       continue;
-    } else {
+    } else if (loop_num >1){
       // we already have the decrypted key
       // int m = -1;
       //
