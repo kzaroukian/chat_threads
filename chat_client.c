@@ -158,10 +158,13 @@ int main(int argc, char** argv){
 
 	OpenSSL_add_all_algorithms();
 
+	// recv RSA pub key
+	int g = recv(sockfd, public_key, sizeof(public_key), 0);
+
   // from cryptotest.c
 	FILE* pubkey_file = fopen("RSApub.pem","rb");
 	// generates the public key
-	public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
+	//public_key = PEM_read_PUBKEY(pubkey_file,NULL,NULL,NULL);
 	// only want to randomly generate symmetric key once
 	RAND_bytes(symmetric_key,32);
 
