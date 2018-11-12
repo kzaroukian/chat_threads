@@ -138,15 +138,15 @@ void* receivemessage(void* arg) {
 		BIO_dump_fp(stdout, line, k);
 
 		char decrypted_line[5000];
-		char len_res[3];
+		char len_res[4];
 		unsigned char iv2[16];
 
 		printf("Decrypting:\n");
 		memcpy(len_res, line, 4);
-		//int encrypt_length = atoi(len_res);
+		int encrypt_length = atoi(len_res);
 		printf("Num: %d\n", encrypt_length);
 		//iv2[16] = '\0';
-		strncpy(iv2,line+3,16);
+		strncpy(iv2,line+4,16);
 		//memcpy(iv2, line+3, 16);
 		printf("iv: %s\n", iv2);
 		printf("SIZE: %d\n", strlen(iv2));
@@ -154,7 +154,7 @@ void* receivemessage(void* arg) {
 
 		int r = 0;
 
-		memcpy(no_iv,line+19,5000);
+		memcpy(no_iv,line+20,k);
 		printf("no iv: %s\n", no_iv);
 		printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
