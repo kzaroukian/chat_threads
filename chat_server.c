@@ -168,7 +168,7 @@ void* handleclient(void* arg) {
       // printf("we should have the encrypted key now r val: %d\n", r);
 
       // we should have now received the encrypted key
-      int decryptedkey_len = rsa_decrypt(encrypted_key, sizeof(encrypted_key), private_key,symmetric_key);
+      int decryptedkey_len = rsa_decrypt(encrypted_key, strlen(encrypted_key), private_key,symmetric_key);
       printf("RSA decrypt isn;t the prob\n");
 
       // now we have the decrypted symmetric key!
