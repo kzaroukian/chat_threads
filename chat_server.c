@@ -237,8 +237,9 @@ void* handleclient(void* arg) {
       int fin = strlen(no_iv);
       // lets decrypt the message sent
       int decrypt_len = round_by_sixteen(fin);
+      printf("Data: %d\n", encrypt_length);
       printf("Decrypt length %d\n", decrypt_len);
-      int decryptedline_len = decrypt(no_iv, encrypt_length, symmetric_key, iv, decrypted_line);
+      int decryptedline_len = decrypt(no_iv, decrypt_len, symmetric_key, iv, decrypted_line);
       printf("decrypting worked?\n");
 
 
