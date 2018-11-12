@@ -159,7 +159,7 @@ void* handleclient(void* arg) {
       //int r = -1;
       char encrypted_key[5000];
       memcpy(encrypted_key,line+4,sizeof(line)-4);
-      printf("encrypted key: %s\n", encrypted_key);
+      printf("length: %d, encrypted key: %s\n", strlen(encrypted_key),encrypted_key);
       // while (r < 0) {
       //   r = recv(clientsocket,encrypted_key,32,0);
       //   printf("encrypted key\n");

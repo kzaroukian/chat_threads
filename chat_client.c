@@ -184,7 +184,7 @@ int main(int argc, char** argv){
 	char* key_msg = "~key";
 
 	char complete_key_msg[encryptedkey_len+4];
-	printf("sending key msg\n");
+	printf("sending key msg size: %d\n", encryptedkey_len);
 	printf("encrypted_key: %s\n", encrypted_key);
 	memcpy(complete_key_msg,key_msg,4);
 	memcpy(complete_key_msg + 4,encrypted_key,encryptedkey_len);
