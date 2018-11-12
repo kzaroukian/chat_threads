@@ -65,8 +65,8 @@ int round_by_sixteen(int len) {
     int high_val = 16 * (i + 1);
     if (len > low_val && len < high_val) {
       final = high_val;
-
     }
+    i++;
   }
 
   return final;
