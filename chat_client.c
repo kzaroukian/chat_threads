@@ -156,11 +156,11 @@ void* receivemessage(void* arg) {
 		//memcpy(iv2, line+3, 16);
 	//	printf("iv: %s\n", iv2);
 	//	printf("SIZE: %d\n", strlen(iv2));
-		char no_iv[5000];
+		char no_iv[k-20];
 
 		int r = 0;
 
-		memcpy(no_iv,line+20,k);
+		memcpy(no_iv,line+20,k-20);
 		//printf("no iv: %s\n", no_iv);
 		//printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
