@@ -362,25 +362,19 @@ void* handleclient(void* arg) {
 
         memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
         final_encrypt[encryptedtxt_len] = '\0';
-        //printf("ENCRYPTION: %s\n", final_encrypt);
-        // strcat(final,num_char);
-        // strcat(final,test);
-        // strcat(final,final_encrypt);
-        // printf("FINAL: %s\n", final);
 
-        // memcpy(plz_work,num_char,3);
-        // memcpy(plz_work+3,test,16);
-        // memcpy(plz_work+19,encrypted_text,encryptedtxt_len);
-        // printf("PLZ WORK: %s\n", plz_work);
-        //
-        //
-        memcpy(encrypt_and_iv, num_char, 3);
-        memcpy(encrypt_and_iv+3, test, 16);
-        memcpy(encrypt_and_iv+19, encrypted_text, encryptedtxt_len);
+        // memcpy(enctypt_and_iv,encrypted_txt_len, 4);
+        memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
+        //memcpy(encrypt_and_iv, num_char, 3);
+        memcpy(encrypt_and_iv+4, iv2, 16);
+        memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
         // printf("encrypt_and_iv: %s\n", encrypt_and_iv);
         // printf("sizeof %d\n", sizeof(encrypt_and_iv));
         // // encrypt_and_iv[encryptedtxt_len+19] = '\0';
-        encrypt_and_iv[encryptedtxt_len+19] = '\0';
+      //  encrypt_and_iv[encryptedtxt_len+19] = '\0';
+
+        printf("IV\n" );
+        BIO_dump_fp(stdout, iv2, 16);
 
 
         printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
