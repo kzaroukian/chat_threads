@@ -332,20 +332,23 @@ void* handleclient(void* arg) {
         		//char encrypted_text[5000];
         		printf("symmetric key %s \n", symmetric_key);
         		int encryptedtxt_len = encrypt(decrypted_line, strlen(decrypted_line), symmetric_key, iv2, encrypted_text);
-        		char num_char[3];
+
+            char num_char[3];
         		sprintf(num_char,"%d",encryptedtxt_len);
         		printf("NUM CHAR: %s\n", num_char);
 
         		printf("encrypted txt: %s\n", encrypted_text);
         		printf("encrypt length: %d\n", encryptedtxt_len);
-        		char encrypt_and_iv[encryptedtxt_len+19];
+        		char encrypt_and_iv[64];
         	//	char encrypt_len[3];
         		//sprintf(encrypt_len, "%d",encryptedtxt_len);
         		memcpy(encrypt_and_iv, num_char, 3);
         		memcpy(encrypt_and_iv+3, iv2, 16);
         		memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
         		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-        		encrypt_and_iv[encryptedtxt_len+19] = '\0';
+        		// encrypt_and_iv[encryptedtxt_len+19] = '\0';
+            encrypt_and_iv[64] = '\0';
+
 
         		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
         		// int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+19,0);
