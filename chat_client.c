@@ -239,7 +239,7 @@ int main(int argc, char** argv){
 		printf("encrypt length: %d\n", encryptedtxt_len);
 		char encrypt_and_iv[encryptedtxt_len+16];
 		char encrypt_len[3];
-		sprintf(encrypt_len, encryptedtxt_len, 3);
+		sprintf(encrypt_len, "%d",encryptedtxt_len);
 		memcpy(encrypt_and_iv+3, iv, 16);
 		memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
