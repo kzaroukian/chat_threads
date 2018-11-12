@@ -174,16 +174,19 @@ int main(int argc, char** argv){
 	// should we send a warning message first?
 
 	char* key_msg = "~key";
+	char complete_key_msg[36];
 	printf("sending key msg\n");
-	int r = send(sockfd,key_msg,strlen(key_msg)+1,0);
-	int c= -1;
+	memcpy(complete_key_msg,key_msg,4);
+	memcpy(complete_key_msg + 4,encrypted_key,32);
+	int r = send(sockfd,complete_key_msg,36+1,0);
+	// int c= -1;
 
-	// blocks till the key is sent
-	while (c < 0) {
-		c = send(sockfd,encrypted_key,encryptedkey_len+1,0);
-		printf("sending encrypted key");
-	}
-	if (c == 0) {
+	// // blocks till the key is sent
+	// while (c < 0) {
+	// 	c = send(sockfd,encrypted_key,encryptedkey_len+1,0);
+	// 	printf("sending encrypted key");
+	// }
+	if (r == 0) {
 		printf("ERROR key unable to be sent\n");
 		return 3;
 	}
@@ -215,13 +218,16 @@ int main(int argc, char** argv){
 
 		//int x=send(sockfd,line,strlen(line)+1,0);
 		// send the encrypted text
-		int x=send(sockfd,encrypted_text,encryptedtxt_len,0);
+		char encrypt_and_iv[5016];
+		memcpy(encrypt_and_iv, iv, 16);
+		memcpy(encrypt_and_iv+16,encrypted_text,5000);
+		int x=send(sockfd,encrypt_and_iv,sizeof(encrypt_and_iv)+1,0);
 		// send the encrypted message & then send the iv
-		int u = -1;
-		// block till the iv is sent
-		while (u<0){
-			u = send(sockfd,iv,strlen(iv)+1,0);
-		}
+		// int u = -1;
+		// // block till the iv is sent
+		// while (u<0){
+		// 	u = send(sockfd,iv,strlen(iv)+1,0);
+		// }
 
 		if(strncmp(line, "Quit\n", 4) == 0) {
 			close(sockfd);
