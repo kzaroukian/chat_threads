@@ -348,9 +348,19 @@ void* handleclient(void* arg) {
         unsigned char encrypt_and_iv[encryptedtxt_len+19];
       //	char encrypt_len[3];
         //sprintf(encrypt_len, "%d",encryptedtxt_len);
+        char final[encryptedtxt_len+19] = {0};
         unsigned char test[16];
         memcpy(test,iv2,16);
         printf("TEST: %s\n", test);
+        unsigned char final_encrypt[encryptedtxt_len];
+        memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
+        final_encrypt[encryptedtxt_len] = '\0';
+        printf("ENCRYPTION: %s\n", final_encrypt);
+        strcat(final,num_char);
+        strcat(final,test);
+        strcat(final,final_encrypt);
+        printf("FINAL: %s\n", final);
+
 
         memcpy(encrypt_and_iv, num_char, 3);
         memcpy(&encrypt_and_iv[3], test, 16);
