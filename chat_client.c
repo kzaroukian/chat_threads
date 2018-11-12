@@ -140,6 +140,9 @@ void* receivemessage(void* arg) {
 		char decrypted_line[5000];
 		char len_res[4];
 		unsigned char iv2[16];
+		int t = 0;
+		memcpy(t,line,4);
+		printf("T val: %d\n", t);
 
 		printf("Decrypting:\n");
 		memcpy(len_res, line, 4);
