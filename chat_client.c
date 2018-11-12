@@ -240,6 +240,7 @@ int main(int argc, char** argv){
 		memcpy(encrypt_and_iv, iv, 16);
 		memcpy(encrypt_and_iv+16,encrypted_text,encryptedtxt_len);
 		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
+		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+16,0);
 
 		//int r = send(sockfd, line, 5000, 0);
