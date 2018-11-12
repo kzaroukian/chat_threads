@@ -766,15 +766,16 @@ void* handleclient(void* arg) {
         }
 
         printf("Start decryption\n");
-        char ans_len[3];
-        memcpy(ans_len, ans, 3);
-        int ans_encrypt_len = atoi(ans_len);
-        printf("Num: %d\n", ans_len);
-        memcpy(iv2, ans+3, 16);
+        // char ans_len[3];
+        // memcpy(ans_len, ans, 3);
+        int ans_encrypt_len = 0;
+        memcpy(ans_encrypt_len, ans, 4);
+        //printf("Num: %d\n", ans_len);
+        memcpy(iv2, ans+4, 16);
         printf("iv: %s\n", iv2);
         char no_iv2[s-20];
 
-        memcpy(no_iv2,ans+19,s-20);
+        memcpy(no_iv2,ans+20,s-20);
         printf("no iv2: %s\n", no_iv2);
 
         int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
