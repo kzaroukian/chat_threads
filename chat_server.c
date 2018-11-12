@@ -276,6 +276,11 @@ void* handleclient(void* arg) {
         return 0;
 
       }
+
+      if (get_clients_vals->socket[s_index] == -1) {
+        close(clientsocket);
+        return 0;
+      }
       printf("Got from client: %s\n", decrypted_line);
       printf("Total Connections: %d\n", get_clients_vals->connections_num);
       printf("Socket 1: %d\n", get_clients_vals->socket[0]);
@@ -825,7 +830,7 @@ void* handleclient(void* arg) {
 
           // send message to client to let them know we're closing them
           int f = send(send_socket,encryptmsg_and_iv,encryptedmsg_len+20,0);
-          close(send_socket);
+          //close(send_socket);
 
           //break;
           //continue;
