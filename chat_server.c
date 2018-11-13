@@ -484,6 +484,8 @@ void* handleclient(void* arg) {
             send_socket = get_clients_vals->socket[y];
             send_spot = y;
           }
+          printf("send socket: %d\n", send_socket);
+          printf("match length%d\n", strlen(match));
 
         }
         if (send_socket > 0) {
