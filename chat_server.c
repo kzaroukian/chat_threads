@@ -137,7 +137,10 @@ void* handleclient(void* arg) {
   int loop_num = 0;
   while (1) {
     loop_num += 1;
+    printf("\n");
     printf("Iteration: %d\n", loop_num);
+    printf("\n");
+
     char line[5000];
     char decrypted_line[5000];
     int t = recv(clientsocket,line,5000,0);
@@ -199,7 +202,7 @@ void* handleclient(void* arg) {
       printf("Finished decrypting\n");
 
       printf("\n");
-      printf("DECRYPTED LINE: \n", decrypted_line);
+      printf("DECRYPTED LINE: %s\n", decrypted_line);
 
       // means we need to destroy this thread
       // this closes the thread
@@ -413,6 +416,7 @@ void* handleclient(void* arg) {
         for(;o<get_clients_vals->connections_num; o++) {
           if(get_clients_vals->socket[o] > 0) {
             printf("Starting Encryption: \n");
+            printf("On: %s\n", get_clients_vals->client_name[0]);
 
             char encrypted_msg[5000];
             unsigned char iv_msg[16];
