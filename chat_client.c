@@ -1,5 +1,4 @@
 // Project 3 Chat Client by Kaylin Zaroukian
-//
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -36,6 +35,7 @@ void handleErrors(void)
   abort();
 }
 
+// got from cryptotest.c
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 	    unsigned char *iv, unsigned char *plaintext){
   EVP_CIPHER_CTX *ctx;
@@ -53,6 +53,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   return plaintext_len;
 }
 
+// got from cryptotest.c
 // encrypts with rsa public key
 int rsa_encrypt(unsigned char* in, size_t inlen, EVP_PKEY *key, unsigned char* out){
   EVP_PKEY_CTX *ctx;
@@ -71,6 +72,7 @@ int rsa_encrypt(unsigned char* in, size_t inlen, EVP_PKEY *key, unsigned char* o
   return outlen;
 }
 
+// got from cryptotest.c
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 	unsigned char *iv, unsigned char *ciphertext){
   EVP_CIPHER_CTX *ctx;

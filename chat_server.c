@@ -28,13 +28,6 @@ struct clients {
   u_int kicked_socket;
 };
 
-// struct of args to pass and send
-struct args{
-  u_int our_socket;
-  int index;
-  struct clients client_list;
-};
-
 struct clients *connections;
 char password[6];
 unsigned char symmetric_key[32];
@@ -55,24 +48,8 @@ void sigHandler(int signum) {
 
 
 char* commands() {
-  char* send = "Commands: \n get all clients - returns all clients \n sendto clientName - send to specific client\n sendto - sends to all \n *kick clientname - disconnects a client\n me - returns my username";
+  char* send = "Commands: \n get all clients - returns all clients \n sendto clientName - send to specific client\n bcast - sends to all \n *kick clientname - disconnects a client\n me - returns my username";
   return send;
-}
-
-
-char* getListOfClients() {
-  struct clients *get_clients_vals = getClients();
-  printf("Total Connections: %d\n", get_clients_vals->connections_num);
-  char* connected_list;
-  int s = 0;
-  int index = 0;
-  for(;s<get_clients_vals->connections_num;s++) {
-    strcat(connected_list, get_clients_vals->client_name[s]);
-    memcpy(connected_list,get_clients_vals->client_name[s],index);
-    index+=3;
-  }
-  return connected_list;
-
 }
 
 void handleErrors(void)
@@ -81,6 +58,7 @@ void handleErrors(void)
   abort();
 }
 
+// got from cryptotest.c
 int rsa_decrypt(unsigned char* in, size_t inlen, EVP_PKEY *key, unsigned char* out){
   EVP_PKEY_CTX *ctx;
   size_t outlen;
@@ -98,6 +76,7 @@ int rsa_decrypt(unsigned char* in, size_t inlen, EVP_PKEY *key, unsigned char* o
   return outlen;
 }
 
+// got from cryptotest.c
 int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
 	    unsigned char *iv, unsigned char *plaintext){
   EVP_CIPHER_CTX *ctx;
@@ -124,6 +103,7 @@ int decrypt(unsigned char *ciphertext, int ciphertext_len, unsigned char *key,
   return plaintext_len;
 }
 
+// got from cryptotest.c
 int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 	unsigned char *iv, unsigned char *ciphertext){
   EVP_CIPHER_CTX *ctx;
@@ -143,14 +123,12 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
 
 void* handleclient(void* arg) {
   printf("made it into recv thread\n");
-  struct args *our_arg = (struct args *) arg;
   struct clients *client_val = (struct clients *)malloc(sizeof(struct clients));
   struct clients *get_clients_vals;
   unsigned char iv[16];
 
-  int clientsocket = our_arg->our_socket;
+  int clientsocket = *(int*)arg;
 
-  // failsafe if thread isn't detached
   if (clientsocket == -1) {
     return 0;
   }
@@ -431,12 +409,6 @@ void* handleclient(void* arg) {
             send_socket = get_clients_vals->socket[y];
             send_spot = y;
           }
-        //  printf("send socket: %d\n", send_socket);
-
-          // if(send_socket == 0) {
-          //   memcpy(match, "all",3);
-          //   match[3] = '\0';
-          // }
 
         }
         if (send_socket > 0) {
@@ -518,87 +490,7 @@ void* handleclient(void* arg) {
           BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
 
           int j = send(send_socket, encryptmsg_and_iv, encryptedmsg_len+20,0);
-
-        }// else if(strncmp(match,"all", strlen(match)) == 0) {
-        //   char* temp = "What message would you like to send?";
-        //
-        //   printf("Starting Encryption: \n");
-        //
-        //   char encrypted_text[5000];
-        //   unsigned char iv1[16];
-        //
-        //   RAND_bytes(iv1,16);
-        //
-        //   int encryptedtxt_len = encrypt(temp, strlen(temp),get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
-        //
-        //   unsigned char encrypt_and_iv[encryptedtxt_len+20];
-        //
-        //   memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
-        //   memcpy(encrypt_and_iv+4, iv1, 16);
-        //   memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
-        //
-        //   // printf("IV\n" );
-        //   // BIO_dump_fp(stdout, iv1, 16);
-        //
-        //   // printf("BIO DUMP\n");
-        //   // BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
-        //
-        //   int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
-        //
-        //   int s = 0;
-        //   char ans[5000];
-        //   char decrypted_ans[5000];
-        //   char iv2[16];
-        //
-        //   while(s < 1) {
-        //     s = recv(clientsocket,ans,5000,0);
-        //   }
-        //
-        //   printf("DECRYPTION\n");
-        //
-        //   int ans_encrypt_len = 0;
-        //   memcpy(&ans_encrypt_len, ans, 4);
-        //   memcpy(iv2, ans+4, 16);
-        //   char no_iv2[s-20];
-        //
-        //   memcpy(no_iv2,ans+20,s-20);
-        //
-        //   int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
-        //   printf("decrypting finished!\n");
-        //
-        //   printf("\n");
-        //   printf(" Decrypted char: %s\n", decrypted_ans);
-        //   printf("\n");
-        //
-        //   int o = 0;
-        //   for(;o<get_clients_vals->connections_num; o++) {
-        //     if(get_clients_vals->socket[o] > 0) {
-        //       printf("Starting Encryption: \n");
-        //
-        //       char encrypted_msg[5000];
-        //       unsigned char iv_msg[16];
-        //
-        //       RAND_bytes(iv_msg,16);
-        //
-        //       int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), get_clients_vals->symmetric_keys[o], iv_msg, encrypted_msg);
-        //
-        //       unsigned char encryptmsg_and_iv[encryptedmsg_len+20];
-        //
-        //       memcpy(encryptmsg_and_iv, &encryptedmsg_len, 4);
-        //       memcpy(encryptmsg_and_iv+4, iv_msg, 16);
-        //       memcpy(encryptmsg_and_iv+20, encrypted_msg, encryptedmsg_len);
-        //
-        //       // printf("IV\n" );
-        //       // BIO_dump_fp(stdout, iv_msg, 16);
-        //
-        //
-        //       printf("Encrypted Message to send:\n");
-        //       BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
-        //       int p = send(get_clients_vals->socket[o],encryptmsg_and_iv, encryptedmsg_len+20,0);
-        //     }
-        //   }
-        //
-        // }
+        }
       }
 
       if(strncmp(decrypted_line, "*kick", 5) == 0) {
@@ -699,7 +591,6 @@ void* handleclient(void* arg) {
           printf("Encrypted message to send: \n");
           BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
 
-
           // send message to client to let them know we're closing them
           int f = send(send_socket,encryptmsg_and_iv,encryptedmsg_len+20,0);
 
@@ -720,8 +611,8 @@ void* handleclient(void* arg) {
 }
 
 void* handleserver(void* arg) {
-  struct args *our_arg = (struct args *)arg;
-  int clientsocket = our_arg->our_socket;
+
+  int clientsocket = *(int*)arg;;
 
   while(1) {
     char line2[5000];
@@ -810,24 +701,6 @@ int main(int argc, char** argv) {
     printf("Socket Num: %d\n",connections->socket[0] );
     printf("Socket Num: %d\n",connections->socket[1] );
 
-    printf("creating arg struct\n");
-
-    struct args *args_to_pass = (struct args*)malloc(sizeof(struct args));
-    memcpy(&args_to_pass->client_list, &connections, sizeof(connections));
-    // we need to loop through and copy each item (sad)
-    args_to_pass->client_list.connections_num = connections->connections_num;
-    // memcpy(&args_to_pass->client_list.connections_num, &connections->connections_num, sizeof(connections->connections_num));
-    int s = 0;
-    for(;s<connections->connections_num;s++) {
-      args_to_pass->client_list.socket[s] = connections->socket[s];
-      memcpy(args_to_pass->client_list.client_name[s], connections->client_name[s], 3);
-    }
-    args_to_pass->our_socket = clientsocket;
-    args_to_pass->index = placeholder;
-    printf("Socket Num: %d\n", args_to_pass->client_list.socket[0]);
-    printf("Connections num: %d\n", args_to_pass->client_list.connections_num);
-
-    printf("ARG SOCKET: %d\n", clientsocket);
 
     placeholder += 1;
     // add the socket to our struct
@@ -838,14 +711,11 @@ int main(int argc, char** argv) {
     printf("creating threads\n");
     printf("\n");
 
-    pthread_create(&receive, NULL, handleclient, args_to_pass);
+    pthread_create(&receive, NULL, handleclient, clientsocket);
     pthread_detach(receive);
 
-    pthread_create(&send, NULL, handleserver, args_to_pass);
+    pthread_create(&send, NULL, handleserver, clientsocket);
     pthread_detach(send);
-
-
-
 
 	}
   EVP_cleanup();
