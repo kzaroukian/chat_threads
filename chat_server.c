@@ -489,6 +489,7 @@ void* handleclient(void* arg) {
 
           if(send_socket == 0) {
             memcpy(match, "all",3);
+            printf("MATCH: %s",match)
           }
           printf("MATCH vs all %d\n", strncmp(match,"all", strlen(match)));
 
