@@ -25,6 +25,7 @@ struct clients {
   u_int socket[10];
   int connections_num;
   char symmetric_keys[10][32];
+  u_int kicked_socket;
 };
 
 // struct of args to pass and send
@@ -469,6 +470,7 @@ void* handleclient(void* arg) {
       if(strncmp(decrypted_line,"sendto",6) == 0){
         char match[3];
         memcpy(match,decrypted_line + 7,3);
+        printf("MATCH vs all %d\n", strncmp(match,"all", strlen(match));
         u_int send_socket = 0;
         printf("TO: %s\n",match);
         printf("Size: %lu\n", strlen(match));
@@ -486,13 +488,6 @@ void* handleclient(void* arg) {
         }
         if (send_socket > 0) {
           char* temp = "What message would you like to send?";
-          // need to first encrypt
-          // now we re-encrypt before sending
-
-          // char encrypted_text_1[5000];
-          // int length1 = 0;
-          // encrypt_msg(temp,encrypted_text_1, length1);
-          // int u = send(clientsocket, encrypted_text_1, length1+19,0);
 
           printf("msg : %s\n", temp);
           printf("Starting Encryption: \n");
@@ -568,9 +563,6 @@ void* handleclient(void* arg) {
 
 
           // now we re-encrypt before sending
-          // char encrypted_text[5000];
-          // int length = 0;
-          // encrypt_msg(decrypted_ans, encrypted_text, length);
 
           printf("Starting Encryption: \n");
 
