@@ -487,6 +487,12 @@ void* handleclient(void* arg) {
           printf("send socket: %d\n", send_socket);
           printf("match length%d\n", strlen(match));
 
+          if(send_socket == 0) {
+            memcpy(match, "all",3);
+          }
+          printf("MATCH vs all %d\n", strncmp(match,"all", strlen(match)));
+
+
         }
         if (send_socket > 0) {
           char* temp = "What message would you like to send?";
@@ -598,7 +604,7 @@ void* handleclient(void* arg) {
           int j = send(send_socket, encryptmsg_and_iv, encryptedmsg_len+20,0);
           printf("waiting %d\n", j);
 
-        } else if(strncmp(match,"all", strlen(match)) == -86) {
+        } else if(strncmp(match,"all", strlen(match)) == 0) {
           char* temp = "What message would you like to send?";
 
           // char encrypted_text_1[5000];
