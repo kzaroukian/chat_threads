@@ -470,7 +470,7 @@ void* handleclient(void* arg) {
       if(strncmp(decrypted_line,"sendto",6) == 0){
         char match[3];
         memcpy(match,decrypted_line + 7,3);
-        printf("MATCH vs all %d\n", strncmp(match,"all", strlen(match));
+        printf("MATCH vs all %d\n", strncmp(match,"all", strlen(match)));
         u_int send_socket = 0;
         printf("TO: %s\n",match);
         printf("Size: %lu\n", strlen(match));
