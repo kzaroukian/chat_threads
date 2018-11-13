@@ -131,7 +131,7 @@ void* receivemessage(void* arg) {
 		printf("\n");
 
 		printf("Encrypted text received: \n");
-		BIO_dump_fp(std_out, line, k);
+		BIO_dump_fp(stdout, line, k);
 		printf("\n");
 
 		int decryptedline_len = decrypt(no_iv, t, symmetric_key, iv2, decrypted_line);
