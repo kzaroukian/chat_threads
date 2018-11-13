@@ -88,36 +88,6 @@ int encrypt(unsigned char *plaintext, int plaintext_len, unsigned char *key,
   return ciphertext_len;
 }
 
-void encrypt_msg(char* decrypt_txt, char* encrypt_txt, int encryptedtxt_len) {
-  // now we re-encrypt before sending
-  unsigned char encrypt_iv[16];
-  char encrypted_text[5000];
-  RAND_bytes(encrypt_iv,16);
-
-  encryptedtxt_len = encrypt(decrypt_txt, strlen(decrypt_txt), symmetric_key, encrypt_iv, encrypted_text);
-  char num_char[3];
-  sprintf(num_char,"%d",encryptedtxt_len);
-  printf("NUM CHAR: %s\n", num_char);
-
-  printf("encrypted txt: %s\n", encrypted_text);
-  printf("encrypt length: %d\n", encryptedtxt_len);
-  //char encrypt_and_iv[encryptedtxt_len+19];
-//	char encrypt_len[3];
-  //sprintf(encrypt_len, "%d",encryptedtxt_len);
-	char encrypt_and_iv[encryptedtxt_len+19];
-//	char encrypt_len[3];
-  //sprintf(encrypt_len, "%d",encryptedtxt_len);
-  memcpy(encrypt_and_iv, num_char, 3);
-  memcpy(encrypt_and_iv+3, encrypt_iv, 16);
-  memcpy(encrypt_and_iv+19,encrypted_text,encryptedtxt_len);
-  printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-  encrypt_and_iv[encryptedtxt_len+19] = '\0';
-
-  memcpy(encrypt_txt,encrypt_and_iv,encryptedtxt_len+19);
-
-  printf("encrypt_and_iv size: %d\n", strlen(encrypt_txt));
-}
-
 void* receivemessage(void* arg) {
 	int serversocket = *(int*)arg;
 	while(1) {
@@ -125,13 +95,6 @@ void* receivemessage(void* arg) {
 		// receive message
 		char line[5000];
 		int k = recv(serversocket,line,5000,0);
-
-		// now we decrypt the message
-		//char decrypted_text[5000];
-		//int decryptedtext_len = decrypt(line2, strlen(line2+1), )
-
-		// get the iv
-	//	printf("received message: %s\n", line);
 
 		// once we get the iv get the encrypted msg
 		printf("size of received msg: %d\n", k);
@@ -148,40 +111,30 @@ void* receivemessage(void* arg) {
 		printf("encrypt length: %d\n", t);
 
 		printf("Decrypting:\n");
-		// memcpy(len_res, line, 4);
-		// int encrypt_length = atoi(len_res);
-		//rintf("Num: %d\n", encrypt_length);
-		//iv2[16] = '\0';
-		strncpy(iv2,line+4,16);
-		//memcpy(iv2, line+3, 16);
-	//	printf("iv: %s\n", iv2);
-	//	printf("SIZE: %d\n", strlen(iv2));
+
+		memcpy(iv2,line+4,16);
+
 		char no_iv[k-20];
 
 		int r = 0;
 
 		memcpy(no_iv,line+20,k-20);
-		//printf("no iv: %s\n", no_iv);
-		//printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
 		int decryptedline_len = decrypt(no_iv, t, symmetric_key, iv2, decrypted_line);
 		printf("decrypting worked?\n");
 		printf("\n" );
 		printf("RECEIVED: %s\n", decrypted_line);
+		printf("\n");
 
 		if (strncmp(decrypted_line,"escape_msg",10) == 0) {
 			printf("its a trap\n");
 			char* close_message = "disconnecting_client";
-			// char encrypt[5000];
-			// int length = 0;
-			// encrypt_msg(close_message,encrypt, length);
+
 			char encrypted_text[5000];
 			unsigned char iv1[16];
 
 			RAND_bytes(iv1,16);
-			printf("IV %s\n",iv1 );
 
-			printf("symmetric key %s \n", symmetric_key);
 			int encryptedtxt_len = encrypt(close_message, strlen(close_message), symmetric_key, iv1, encrypted_text);
 
 			unsigned char encrypt_and_iv[encryptedtxt_len+20];
@@ -198,8 +151,6 @@ void* receivemessage(void* arg) {
 
 			printf("QUIT MESSAGE \n");
 			BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
-
-			//int u = send(clientsocket, encrypt_and_iv, encryptedtxt_len+20,0);
 
 			int x=send(serversocket,encrypt_and_iv,encryptedtxt_len+20,0);
 			close(serversocket);
@@ -257,10 +208,6 @@ int main(int argc, char** argv){
 
 	OpenSSL_add_all_algorithms();
 
-	// recv RSA pub key
-	// char pub_key[5000];
-	// int g = recv(sockfd, pub_key, sizeof(pub_key), 0);
-
 
   // from cryptotest.c
 	FILE* pubkey_file = fopen("RSApub.pem","rb");
@@ -272,6 +219,9 @@ int main(int argc, char** argv){
 	// only want to randomly generate symmetric key once
 	RAND_bytes(symmetric_key,32);
 
+	printf("Symmetric key:\n");
+	BIO_dump_fp(stdout, symmetric_key, 32);
+
 	// encrypted key to send
 	unsigned char encrypted_key[256];
 
@@ -280,22 +230,17 @@ int main(int argc, char** argv){
 	// now we send the encrypted key to the server
 	// should we send a warning message first?
 
+	printf("Encrypted key:\n");
+	BIO_dump_fp(stdout, encrypted_key, encryptedkey_len);
+
 	char* key_msg = "~key";
-	printf("Key: %s", symmetric_key);
 
 	char complete_key_msg[encryptedkey_len+4];
-	//printf("sending key msg size: %d\n", encryptedkey_len);
-	//printf("encrypted_key: %s\n", encrypted_key);
+
 	memcpy(complete_key_msg,key_msg,4);
 	memcpy(complete_key_msg + 4,encrypted_key,encryptedkey_len);
 	int r = send(sockfd,complete_key_msg,encryptedkey_len+4,0);
-	// int c= -1;
 
-	// // blocks till the key is sent
-	// while (c < 0) {
-	// 	c = send(sockfd,encrypted_key,encryptedkey_len+1,0);
-	// 	printf("sending encrypted key");
-	// }
 	if (r == 0) {
 		printf("ERROR key unable to be sent\n");
 		return 3;
@@ -308,53 +253,32 @@ int main(int argc, char** argv){
 			return 0;
 		}
 
-		// send message
-		// randomly generates a iv everytime we send a message
-
 		pthread_t receive;
 
 		pthread_create(&receive, NULL, receivemessage, &sockfd);
 
 		pthread_detach(receive);
 
-		//int x=send(sockfd,line,strlen(line)+1,0);
-		// send the encrypted text
-
-
 		printf("Enter a line: ");
 		char line[5000];
 		fgets(line,5000,stdin);
 
-		printf("strlen of what i entered: %d\n", strlen(line));
-
 		RAND_bytes(iv,16);
-		printf("IV %s\n",iv );
 
 		printf("encrypting\n");
 		char encrypted_text[5000];
-		printf("symmetric key %s \n", symmetric_key);
 		int encryptedtxt_len = encrypt(line, strlen(line), symmetric_key, iv, encrypted_text);
-		// char num_char[3];
-		// sprintf(num_char,"%d",encryptedtxt_len);
-		// printf("NUM CHAR: %s\n", num_char);
 
-		// printf("encrypted txt: %s\n", encrypted_text);
-		// printf("encrypt length: %d\n", encryptedtxt_len);
 		char encrypt_and_iv[encryptedtxt_len+20];
-	//	char encrypt_len[3];
-		//sprintf(encrypt_len, "%d",encryptedtxt_len);
+
 		memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
 		memcpy(encrypt_and_iv+4, iv, 16);
 		memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
-		printf("encrypt_and_iv: %s\n", encrypt_and_iv);
-		//encrypt_and_iv[encryptedtxt_len+20] = '\0';
 
-		printf("BIO DUMP:\n");
+		printf("Encryption:\n");
 		BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
 
-		printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+20,0);
-		printf("Size sent: %d\n", x);
 
 		if(strncmp(line, "Quit\n", 4) == 0) {
 			close(sockfd);
