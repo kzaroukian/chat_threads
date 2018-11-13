@@ -647,7 +647,7 @@ void* handleclient(void* arg) {
         printf("\n");
 
         printf("Encrypted Text:\n");
-        BIO_dump_fp(stdout, no_iv2,s);
+        BIO_dump_fp(stdout, no_iv2,s-20);
         printf("\n");
 
         int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
