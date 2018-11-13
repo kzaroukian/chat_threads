@@ -435,21 +435,9 @@ void* handleclient(void* arg) {
       //  printf("symmetric key %s \n", symmetric_key);
         int encryptedtxt_len = encrypt(temp, strlen(temp), get_clients_vals->symmetric_keys[s_index], iv2, encrypted_text);
 
-        char num_char[3];
-
         //printf("encrypted txt: %s\n", encrypted_text);
       //  printf("encrypt length: %d\n", encryptedtxt_len);
         unsigned char encrypt_and_iv[encryptedtxt_len+20];
-
-        int val = encryptedtxt_len+19;
-        char final[35] = {0};
-        unsigned char test[16];
-        memcpy(test,iv2,16);
-
-        unsigned char final_encrypt[encryptedtxt_len];
-
-        memcpy(final_encrypt,encrypted_text,encryptedtxt_len);
-        final_encrypt[encryptedtxt_len] = '\0';
 
         memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
         memcpy(encrypt_and_iv+4, iv2, 16);
@@ -470,6 +458,7 @@ void* handleclient(void* arg) {
       if(strncmp(decrypted_line,"sendto",6) == 0){
         char match[3];
         memcpy(match,decrypted_line + 7,3);
+        match[3] = '\0';
         printf("MATCH vs all %d\n", strncmp(match,"all", strlen(match)));
         u_int send_socket = 0;
         printf("TO: %s\n",match);
