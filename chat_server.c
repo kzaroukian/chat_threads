@@ -1,6 +1,6 @@
 // Project 3 Chat Server by Kaylin Zaroukian
 
-// NEED TO COMPILE LIKE: gcc chat_server.c -lpthread -o s -lcrypto
+// Note to self: NEED TO COMPILE LIKE: gcc chat_server.c -lpthread -o s -lcrypto
 
 #include <sys/socket.h>
 #include <netinet/in.h>
