@@ -166,7 +166,7 @@ void* handleclient(void* arg) {
       BIO_dump_fp(stdout, encrypted_key, t-4);
 
       printf("Symmetric Key: \n");
-      BIO_dump_fp(stdout, encrypted_key, decryptedkey_len);
+      BIO_dump_fp(stdout,symmetric_key, decryptedkey_len);
 
       // now we have the decrypted symmetric key!
       memcpy(get_clients_vals->symmetric_keys[s_index], symmetric_key, decryptedkey_len);
