@@ -1,6 +1,6 @@
 // Project 3 Chat Server by Kaylin Zaroukian
 
-// NEED TO COMPILE LIKE: gcc chat_server.c -lpthread -o s
+// NEED TO COMPILE LIKE: gcc chat_server.c -lpthread -o s -lcrypto
 
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -334,6 +334,87 @@ void* handleclient(void* arg) {
 
         int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
       }
+
+      if (strncmp(decrypted_line,"bcast",4)==0) {
+        char* temp = "What message would you like to send?";
+
+        printf("Starting Encryption: \n");
+
+        char encrypted_text[5000];
+        unsigned char iv1[16];
+
+        RAND_bytes(iv1,16);
+
+        int encryptedtxt_len = encrypt(temp, strlen(temp),get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
+
+        unsigned char encrypt_and_iv[encryptedtxt_len+20];
+
+        memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
+        memcpy(encrypt_and_iv+4, iv1, 16);
+        memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
+
+        // printf("IV\n" );
+        // BIO_dump_fp(stdout, iv1, 16);
+
+        // printf("BIO DUMP\n");
+        // BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+
+        int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
+
+        int s = 0;
+        char ans[5000];
+        char decrypted_ans[5000];
+        char iv2[16];
+
+        while(s < 1) {
+          s = recv(clientsocket,ans,5000,0);
+        }
+
+        printf("DECRYPTION\n");
+
+        int ans_encrypt_len = 0;
+        memcpy(&ans_encrypt_len, ans, 4);
+        memcpy(iv2, ans+4, 16);
+        char no_iv2[s-20];
+
+        memcpy(no_iv2,ans+20,s-20);
+
+        int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
+        printf("decrypting finished!\n");
+
+        printf("\n");
+        printf(" Decrypted char: %s\n", decrypted_ans);
+        printf("\n");
+
+        int o = 0;
+        for(;o<get_clients_vals->connections_num; o++) {
+          if(get_clients_vals->socket[o] > 0) {
+            printf("Starting Encryption: \n");
+
+            char encrypted_msg[5000];
+            unsigned char iv_msg[16];
+
+            RAND_bytes(iv_msg,16);
+
+            int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), get_clients_vals->symmetric_keys[o], iv_msg, encrypted_msg);
+
+            unsigned char encryptmsg_and_iv[encryptedmsg_len+20];
+
+            memcpy(encryptmsg_and_iv, &encryptedmsg_len, 4);
+            memcpy(encryptmsg_and_iv+4, iv_msg, 16);
+            memcpy(encryptmsg_and_iv+20, encrypted_msg, encryptedmsg_len);
+
+            // printf("IV\n" );
+            // BIO_dump_fp(stdout, iv_msg, 16);
+
+
+            printf("Encrypted Message to send:\n");
+            BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
+            int p = send(get_clients_vals->socket[o],encryptmsg_and_iv, encryptedmsg_len+20,0);
+          }
+        }
+
+      }
       if(strncmp(decrypted_line,"sendto",6) == 0){
         char match[3];
         memcpy(match,decrypted_line + 7,3);
@@ -352,10 +433,10 @@ void* handleclient(void* arg) {
           }
         //  printf("send socket: %d\n", send_socket);
 
-          if(send_socket == 0) {
-            memcpy(match, "all",3);
-            match[3] = '\0';
-          }
+          // if(send_socket == 0) {
+          //   memcpy(match, "all",3);
+          //   match[3] = '\0';
+          // }
 
         }
         if (send_socket > 0) {
@@ -438,86 +519,86 @@ void* handleclient(void* arg) {
 
           int j = send(send_socket, encryptmsg_and_iv, encryptedmsg_len+20,0);
 
-        } else if(strncmp(match,"all", strlen(match)) == 0) {
-          char* temp = "What message would you like to send?";
-
-          printf("Starting Encryption: \n");
-
-          char encrypted_text[5000];
-          unsigned char iv1[16];
-
-          RAND_bytes(iv1,16);
-
-          int encryptedtxt_len = encrypt(temp, strlen(temp),get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
-
-          unsigned char encrypt_and_iv[encryptedtxt_len+20];
-
-          memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
-          memcpy(encrypt_and_iv+4, iv1, 16);
-          memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
-
-          // printf("IV\n" );
-          // BIO_dump_fp(stdout, iv1, 16);
-
-          // printf("BIO DUMP\n");
-          // BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
-
-          int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
-
-          int s = 0;
-          char ans[5000];
-          char decrypted_ans[5000];
-          char iv2[16];
-
-          while(s < 1) {
-            s = recv(clientsocket,ans,5000,0);
-          }
-
-          printf("DECRYPTION\n");
-
-          int ans_encrypt_len = 0;
-          memcpy(&ans_encrypt_len, ans, 4);
-          memcpy(iv2, ans+4, 16);
-          char no_iv2[s-20];
-
-          memcpy(no_iv2,ans+20,s-20);
-
-          int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
-          printf("decrypting finished!\n");
-
-          printf("\n");
-          printf(" Decrypted char: %s\n", decrypted_ans);
-          printf("\n");
-
-          int o = 0;
-          for(;o<get_clients_vals->connections_num; o++) {
-            if(get_clients_vals->socket[o] > 0) {
-              printf("Starting Encryption: \n");
-
-              char encrypted_msg[5000];
-              unsigned char iv_msg[16];
-
-              RAND_bytes(iv_msg,16);
-
-              int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), get_clients_vals->symmetric_keys[o], iv_msg, encrypted_msg);
-
-              unsigned char encryptmsg_and_iv[encryptedmsg_len+20];
-
-              memcpy(encryptmsg_and_iv, &encryptedmsg_len, 4);
-              memcpy(encryptmsg_and_iv+4, iv_msg, 16);
-              memcpy(encryptmsg_and_iv+20, encrypted_msg, encryptedmsg_len);
-
-              // printf("IV\n" );
-              // BIO_dump_fp(stdout, iv_msg, 16);
-
-
-              printf("Encrypted Message to send:\n");
-              BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
-              int p = send(get_clients_vals->socket[o],encryptmsg_and_iv, encryptedmsg_len+20,0);
-            }
-          }
-
-        }
+        }// else if(strncmp(match,"all", strlen(match)) == 0) {
+        //   char* temp = "What message would you like to send?";
+        //
+        //   printf("Starting Encryption: \n");
+        //
+        //   char encrypted_text[5000];
+        //   unsigned char iv1[16];
+        //
+        //   RAND_bytes(iv1,16);
+        //
+        //   int encryptedtxt_len = encrypt(temp, strlen(temp),get_clients_vals->symmetric_keys[s_index], iv1, encrypted_text);
+        //
+        //   unsigned char encrypt_and_iv[encryptedtxt_len+20];
+        //
+        //   memcpy(encrypt_and_iv, &encryptedtxt_len, 4);
+        //   memcpy(encrypt_and_iv+4, iv1, 16);
+        //   memcpy(encrypt_and_iv+20, encrypted_text, encryptedtxt_len);
+        //
+        //   // printf("IV\n" );
+        //   // BIO_dump_fp(stdout, iv1, 16);
+        //
+        //   // printf("BIO DUMP\n");
+        //   // BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+        //
+        //   int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
+        //
+        //   int s = 0;
+        //   char ans[5000];
+        //   char decrypted_ans[5000];
+        //   char iv2[16];
+        //
+        //   while(s < 1) {
+        //     s = recv(clientsocket,ans,5000,0);
+        //   }
+        //
+        //   printf("DECRYPTION\n");
+        //
+        //   int ans_encrypt_len = 0;
+        //   memcpy(&ans_encrypt_len, ans, 4);
+        //   memcpy(iv2, ans+4, 16);
+        //   char no_iv2[s-20];
+        //
+        //   memcpy(no_iv2,ans+20,s-20);
+        //
+        //   int decryptedans_len = decrypt(no_iv2, ans_encrypt_len, get_clients_vals->symmetric_keys[s_index], iv2, decrypted_ans);
+        //   printf("decrypting finished!\n");
+        //
+        //   printf("\n");
+        //   printf(" Decrypted char: %s\n", decrypted_ans);
+        //   printf("\n");
+        //
+        //   int o = 0;
+        //   for(;o<get_clients_vals->connections_num; o++) {
+        //     if(get_clients_vals->socket[o] > 0) {
+        //       printf("Starting Encryption: \n");
+        //
+        //       char encrypted_msg[5000];
+        //       unsigned char iv_msg[16];
+        //
+        //       RAND_bytes(iv_msg,16);
+        //
+        //       int encryptedmsg_len = encrypt(decrypted_ans, strlen(decrypted_ans), get_clients_vals->symmetric_keys[o], iv_msg, encrypted_msg);
+        //
+        //       unsigned char encryptmsg_and_iv[encryptedmsg_len+20];
+        //
+        //       memcpy(encryptmsg_and_iv, &encryptedmsg_len, 4);
+        //       memcpy(encryptmsg_and_iv+4, iv_msg, 16);
+        //       memcpy(encryptmsg_and_iv+20, encrypted_msg, encryptedmsg_len);
+        //
+        //       // printf("IV\n" );
+        //       // BIO_dump_fp(stdout, iv_msg, 16);
+        //
+        //
+        //       printf("Encrypted Message to send:\n");
+        //       BIO_dump_fp(stdout, encryptmsg_and_iv, encryptedmsg_len+20);
+        //       int p = send(get_clients_vals->socket[o],encryptmsg_and_iv, encryptedmsg_len+20,0);
+        //     }
+        //   }
+        //
+        // }
       }
 
       if(strncmp(decrypted_line, "*kick", 5) == 0) {
