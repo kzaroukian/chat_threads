@@ -466,7 +466,7 @@ void* handleclient(void* arg) {
 
         int u = send(clientsocket, encrypt_and_iv,encryptedtxt_len+20,0);
       }
-
+      printf("sendto comp: %d\n", strncmp(decrypted_line,"sendto",6));
       if(strncmp(decrypted_line,"sendto",6) == 0){
         char match[3];
         memcpy(match,decrypted_line + 7,3);
