@@ -122,8 +122,20 @@ void* receivemessage(void* arg) {
 
 		memcpy(no_iv,line+20,k-20);
 
+		printf("IV\n");
+		BIO_dump_fp(stdout, iv2, 16);
+		printf("\n");
+
+		printf("Encrypted Text\n");
+		BIO_dump_fp(stdout, no_iv, k-20);
+		printf("\n");
+
+		printf("Encrypted text received: \n");
+		BIO_dump_fp(std_out, line, k);
+		printf("\n");
+
 		int decryptedline_len = decrypt(no_iv, t, symmetric_key, iv2, decrypted_line);
-		printf("decrypting worked?\n");
+		printf("decrypting worked!\n");
 		printf("\n" );
 		printf("RECEIVED: %s\n", decrypted_line);
 		printf("\n");
@@ -131,6 +143,7 @@ void* receivemessage(void* arg) {
 		if (strncmp(decrypted_line,"escape_msg",10) == 0) {
 			printf("its a trap\n");
 			char* close_message = "disconnecting_client";
+			printf("Message to encrypt: %s\n", close_message);
 
 			char encrypted_text[5000];
 			unsigned char iv1[16];
@@ -147,12 +160,17 @@ void* receivemessage(void* arg) {
 
 			printf("IV\n" );
 			BIO_dump_fp(stdout, iv1, 16);
+			printf("\n");
+
+			printf("Encrypted text: \n");
+			BIO_dump_fp(stdout, encrypted_text, encryptedtxt_len);
+			printf("\n");
 
 
-			printf("encrypt_and_iv size: %d\n", strlen(encrypt_and_iv));
 
-			printf("QUIT MESSAGE \n");
+			printf("Encrypted MESSAGE to send: \n");
 			BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+			printf("\n");
 
 			int x=send(serversocket,encrypt_and_iv,encryptedtxt_len+20,0);
 			close(serversocket);
@@ -277,8 +295,17 @@ int main(int argc, char** argv){
 		memcpy(encrypt_and_iv+4, iv, 16);
 		memcpy(encrypt_and_iv+20,encrypted_text,encryptedtxt_len);
 
-		printf("Encryption:\n");
+		printf("IV\n");
+		BIO_dump_fp(stdout, iv, 16);
+		printf("\n");
+
+		printf("Encrypted text\n");
+		BIO_dump_fp(stdout, encrypted_text, encryptedtxt_len);
+		printf("\n");
+
+		printf("Encryption Text to send:\n");
 		BIO_dump_fp(stdout, encrypt_and_iv, encryptedtxt_len+20);
+		printf("\n");
 
 		int x=send(sockfd,encrypt_and_iv,encryptedtxt_len+20,0);
 
