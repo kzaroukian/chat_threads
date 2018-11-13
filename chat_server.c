@@ -416,7 +416,7 @@ void* handleclient(void* arg) {
         for(;o<get_clients_vals->connections_num; o++) {
           if(get_clients_vals->socket[o] > 0) {
             printf("Starting Encryption: \n");
-            printf("On: %s\n", get_clients_vals->client_name[0]);
+            printf("On: %s\n", get_clients_vals->client_name[o]);
 
             char encrypted_msg[5000];
             unsigned char iv_msg[16];
