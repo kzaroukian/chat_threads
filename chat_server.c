@@ -255,11 +255,7 @@ void* handleclient(void* arg) {
       memcpy(&encrypt_length, line, 4);
       printf("e len: %d\n", t);
 
-      printf("IV\n");
-      BIO_dump_fp(stdout, iv, 16);
 
-      printf("NO IV\n");
-      BIO_dump_fp(stdout, no_iv, t-20);
 
       //printf("Num: %d\n", encrypt_length);
       memcpy(iv, line+4, 16);
@@ -269,6 +265,12 @@ void* handleclient(void* arg) {
       int r = 0;
 
       memcpy(no_iv,line+20,t-20);
+
+      printf("IV\n");
+      BIO_dump_fp(stdout, iv, 16);
+
+      printf("NO IV\n");
+      BIO_dump_fp(stdout, no_iv, t-20);
       //printf("no iv: %s\n", no_iv);
       //printf("str len of no iv %d, sizeo of %d\n", strlen(no_iv), sizeof(no_iv));
 
