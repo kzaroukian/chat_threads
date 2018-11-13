@@ -243,7 +243,7 @@ void* handleclient(void* arg) {
         printf("\n");
 
         printf("Encrypted Text: \n");
-        BIO_dump_fp(stdout, encrypted_text, encryptedtxt_len+20);
+        BIO_dump_fp(stdout, encrypted_text, encryptedtxt_len);
         printf("\n");
 
         printf("Encrypted message to send: \n");
