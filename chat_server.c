@@ -246,12 +246,20 @@ void* handleclient(void* arg) {
 
       // once we get the iv get the encrypted msg
       //char len_res[3];
+      printf("Thread for: %s\n",get_clients_vals->client_name[s_index]);
 
       printf("received msg: \n");
       BIO_dump_fp(stdout, line, t);
 
       int encrypt_length = 0;
       memcpy(&encrypt_length, line, 4);
+      printf("e len: %d\n", t);
+
+      printf("IV\n");
+      BIO_dump_fp(stdout, iv, 16);
+
+      printf("NO IV\n");
+      BIO_dump_fp(stdout, no_iv, t-20);
 
       //printf("Num: %d\n", encrypt_length);
       memcpy(iv, line+4, 16);
