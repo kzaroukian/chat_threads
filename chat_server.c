@@ -711,10 +711,10 @@ int main(int argc, char** argv) {
     printf("creating threads\n");
     printf("\n");
 
-    pthread_create(&receive, NULL, handleclient, clientsocket);
+    pthread_create(&receive, NULL, handleclient, &clientsocket);
     pthread_detach(receive);
 
-    pthread_create(&send, NULL, handleserver, clientsocket);
+    pthread_create(&send, NULL, handleserver, &clientsocket);
     pthread_detach(send);
 
 	}
